@@ -25,7 +25,7 @@ public class TimedSessionTest {
 
   @Test
   public void testSessionLifetime() throws Exception {
-    TimedSessionn strat = new TimedSessionn();
+    TimedSession strat = new TimedSession();
     assertNull(strat.getSessionLifetime());
     assertEquals(new TimeInterval(10L, TimeUnit.MINUTES).toMilliseconds(), strat.sessionLifetime());
     TimeInterval t = new TimeInterval(10L, TimeUnit.HOURS);
@@ -40,7 +40,7 @@ public class TimedSessionTest {
     KieSession session1 = Mockito.mock(KieSession.class);
     KieSession session2 = Mockito.mock(KieSession.class);
     when(mockKieBase.newKieSession()).thenReturn(session1, session2);
-    TimedSessionn strat = new TimedSessionn(new TimeInterval(1L, TimeUnit.MINUTES));
+    TimedSession strat = new TimedSession(new TimeInterval(1L, TimeUnit.MINUTES));
     try {
       LifecycleHelper.initAndStart(strat);
       AdaptrisMessage msg = AdaptrisMessageFactory.getDefaultInstance().newMessage();

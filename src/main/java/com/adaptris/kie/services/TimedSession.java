@@ -23,7 +23,7 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
  * 
  */
 @XStreamAlias("kie-timed-session")
-public class TimedSessionn extends SessionManagementImpl {
+public class TimedSession extends SessionManagementImpl {
 
   private static final TimeInterval DEFAULT_LIFETIME = new TimeInterval(10L, TimeUnit.MINUTES);
 
@@ -31,10 +31,10 @@ public class TimedSessionn extends SessionManagementImpl {
   private TimeInterval sessionLifetime;
   private transient Calendar sessionEndDate;
 
-  public TimedSessionn() {
+  public TimedSession() {
   }
 
-  public TimedSessionn(TimeInterval lifetime) {
+  public TimedSession(TimeInterval lifetime) {
     this();
     setSessionLifetime(lifetime);
   }
@@ -43,6 +43,7 @@ public class TimedSessionn extends SessionManagementImpl {
   public synchronized KieSession get(KieBase b, AdaptrisMessage msg)
       throws Exception {
     if (sessionExpired()) {
+      SessionManagement.disposeQuietly(session);
       session = createSession(b);
     }
     return session;

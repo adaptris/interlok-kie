@@ -82,7 +82,7 @@ configurations {
 dependencies {
   compile ("com.adaptris:interlok-core:$interlokCoreVersion") { changing= true}
   compile ("com.adaptris:interlok-common:$interlokCoreVersion") { changing= true}
-  compile ("com.thoughtworks.xstream:xstream:1.4.11")
+  compile ("com.thoughtworks.xstream:xstream:1.4.11-java7")
   compile ("org.apache.commons:commons-collections4:4.2")
   compile ("org.drools:drools-core:$droolsVersion") {  }
   compile ("org.drools:drools-compiler:$droolsVersion") {  }

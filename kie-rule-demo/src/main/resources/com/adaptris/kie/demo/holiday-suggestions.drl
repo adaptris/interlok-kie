@@ -1,0 +1,31 @@
+package com.adaptris.kie.demo;
+import com.adaptris.holiday.model.*;
+
+rule "Sydney"
+    when
+        $h: Holiday( destination.equalsIgnoreCase("sydney") )
+    then
+        $h.withStopOffs("Singapore", "Hong Kong").setTransportType(Holiday.TransportType.Plane);
+end
+
+rule "California"
+    when
+        $h: Holiday( destination.equalsIgnoreCase("california") )
+    then
+        $h.withStopOffs("New York", "Rocky Mountains").setTransportType(Holiday.TransportType.Plane);
+end
+
+
+rule "Cornwall"
+    when
+        $h: Holiday( destination.equalsIgnoreCase("cornwall") )
+    then
+        $h.withStopOffs("Stonehenge", "Exeter").setTransportType(Holiday.TransportType.Automobile);
+end
+
+rule "Scotland"
+    when
+        $h: Holiday( destination.equalsIgnoreCase("scotland") )
+    then
+        $h.withStopOffs("Hadrians Wall").setTransportType(Holiday.TransportType.Train);
+end

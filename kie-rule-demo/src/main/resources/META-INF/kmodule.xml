@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<kmodule xmlns="http://jboss.org/kie/6.0.0/kmodule">
+    <kbase name="demo" packages="com.adaptris.kie.demo">
+        <ksession name="demo-session"/>
+    </kbase>
+</kmodule>

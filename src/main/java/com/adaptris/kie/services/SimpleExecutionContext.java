@@ -1,7 +1,6 @@
 package com.adaptris.kie.services;
 
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.StreamSupport;
@@ -21,7 +20,6 @@ import org.slf4j.LoggerFactory;
 import com.adaptris.annotation.InputFieldHint;
 import com.adaptris.core.AdaptrisMarshaller;
 import com.adaptris.core.AdaptrisMessage;
-import com.adaptris.core.CoreException;
 import com.adaptris.core.DefaultMarshaller;
 import com.adaptris.core.util.Args;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
@@ -85,17 +83,16 @@ public class SimpleExecutionContext implements ExecutionContext {
   @Override
   public void handleResults(ExecutionResults results, AdaptrisMessage msg) throws Exception {
     if (usesQuery()) {
-      // QueryResults queryResults = (QueryResults) results.getValue(msg.resolve(getQueryResultId()));
-      // Iterator<QueryResultsRow> i = queryResults.iterator();
-      // if (i.hasNext()) {
-      // result = i.next().get(msg.resolve(getQueryResultRowId()));
-      // }
       StreamSupport.stream(((QueryResults) results.getValue(msg.resolve(getQueryResultId()))).spliterator(), true).findFirst()
           .ifPresent(e -> {
-            marshalWithRuntime(e.get(msg.resolve(getQueryResultRowId())), msg);
+            AdaptrisMarshaller.uncheckedMarshal(marshaller(), e.get(msg.resolve(getQueryResultRowId())), () -> {
+              return msg.getOutputStream();
+            });
           });
     } else {
-      marshalWithRuntime(results.getValue(msg.resolve(getInsertId())), msg);
+      AdaptrisMarshaller.uncheckedMarshal(marshaller(), results.getValue(msg.resolve(getInsertId())), () -> {
+        return msg.getOutputStream();
+      });
     }
   }
 
@@ -112,8 +109,8 @@ public class SimpleExecutionContext implements ExecutionContext {
     return this;
   }
 
-  protected AdaptrisMarshaller marshaller() throws CoreException {
-    return getMarshaller() != null ? getMarshaller() : DefaultMarshaller.getDefaultMarshaller();
+  protected AdaptrisMarshaller marshaller() {
+    return DefaultMarshaller.defaultIfNull(getMarshaller());
   }
 
   protected boolean usesQuery() {
@@ -123,14 +120,6 @@ public class SimpleExecutionContext implements ExecutionContext {
         StringUtils.isNotBlank(getQueryName()), StringUtils.isNotBlank(getQueryResultId()),
         StringUtils.isNotBlank(getQueryResultRowId())
     });
-  }
-
-  protected void marshalWithRuntime(Object o, AdaptrisMessage m) {
-    try (OutputStream out = m.getOutputStream()) {
-      marshaller().marshal(o, out);
-    } catch (Exception e) {
-      throw new RuntimeException(e);
-    }
   }
 
   public String getInsertId() {
@@ -185,4 +174,3 @@ public class SimpleExecutionContext implements ExecutionContext {
     return this;
   }
 }
-

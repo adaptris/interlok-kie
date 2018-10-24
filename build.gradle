@@ -78,6 +78,9 @@ configurations {
   all*.exclude group: 'org.eclipse.jetty.orbit', module: 'javax.mail.glassfish'
 }
 
+configurations.all {
+  resolutionStrategy.cacheChangingModulesFor 0, "seconds"
+}
 
 dependencies {
   compile ("com.adaptris:interlok-core:$interlokCoreVersion") { changing= true}
@@ -86,8 +89,6 @@ dependencies {
   compile ("org.apache.commons:commons-collections4:4.2")
   compile ("org.drools:drools-core:$droolsVersion") {  }
   compile ("org.drools:drools-compiler:$droolsVersion") {  }
-  compile ("org.drools:drools-compiler:$droolsVersion") {  }
-
 
   compile ("org.slf4j:slf4j-api:$slf4jVersion")
 
@@ -113,7 +114,7 @@ dependencies {
 
   // this is purely for testing kjar connections, simple kmodule based kjar.
   // don't expect it to change, published out of kie-rule-demo sub-dir.
-  testCompile ('com.adaptris:kie-rule-demo:0.0.1-SNAPSHOT')
+  testCompile ('com.adaptris:kie-rule-demo:0.0.1-SNAPSHOT') { changing= true}
 
   javadoc("com.adaptris:interlok-core-apt:$interlokCoreVersion") { changing= true}
 
@@ -223,11 +224,11 @@ publishing {
       artifact sourcesJar { classifier "sources" }
       pom.withXml {
         asNode().appendNode("name", componentName)
-        asNode().appendNode("description", "Using KIE/Drools as Interlok services")
+        asNode().appendNode("description", "Using KIE/Drools with Interlok services")
         def properties = asNode().appendNode("properties")
         properties.appendNode("target", "3.8.2+")
         properties.appendNode("license", "false")
-        properties.appendNode("tags", "drools,jboss rules, kie")
+        properties.appendNode("tags", "drools,jboss rules,kie")
         properties.appendNode("externalUrl", "https://www.drools.org/learn/documentation.html")
       }
     }

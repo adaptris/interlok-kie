@@ -18,7 +18,6 @@ public class PerMessageSession extends SessionManagementImpl {
   @Override
   public synchronized KieSession get(KieBase b, AdaptrisMessage msg) {
     SessionManagement.disposeQuietly(session);
-    session = b.newKieSession();
-    return session;
+    return b.newKieSession();
   }
 }

@@ -51,7 +51,7 @@ public class MetadataSession extends SessionManagementImpl {
       session = b.newKieSession();
     }
     else {
-      if (msg.containsKey(getMetadataKey())) {
+      if (msg.headersContainsKey(getMetadataKey())) {
         SessionManagement.disposeQuietly(session);
         session = b.newKieSession();
       }

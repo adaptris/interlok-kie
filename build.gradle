@@ -1,0 +1,240 @@
+import org.apache.tools.ant.taskdefs.condition.Os
+import org.apache.tools.ant.filters.*
+
+plugins {
+  id 'java'
+  id 'maven'
+  id 'maven-publish'
+  id 'jacoco'
+  // Manage optional dependencies in maven pom.
+  id 'nebula.optional-base' version '4.0.1'
+}
+
+ext {
+  interlokCoreVersion = project.hasProperty('interlokCoreVersion') ? project.getProperty('interlokCoreVersion') : '3.8-SNAPSHOT'
+  releaseVersion = project.hasProperty('releaseVersion') ? project.getProperty('releaseVersion') : '3.8-SNAPSHOT'
+  nexusBaseUrl = project.hasProperty('nexusBaseUrl') ? project.getProperty('nexusBaseUrl') : 'https://development.adaptris.net/nexus'
+  mavenPublishUrl = project.hasProperty('mavenPublishUrl') ? project.getProperty('mavenPublishUrl') : nexusBaseUrl + '/content/repositories/snapshots'
+  javadocsBaseUrl = nexusBaseUrl + "/content/sites/javadocs/com/adaptris"
+  repoUsername = project.hasProperty('repoUsername') ? project.getProperty('repoUsername') : 'unknown'
+  repoPassword = project.hasProperty('repoPassword') ? project.getProperty('repoPassword') : 'unknown'
+  defaultNexusRepo = project.hasProperty('defaultNexusRepo') ? project.getProperty('defaultNexusRepo') : 'https://repo1.maven.org/maven2/'
+  interlokJavadocs= project.hasProperty('interlokJavadocs') ? project.getProperty('interlokJavadocs') : javadocsBaseUrl + "/interlok-core/" + interlokCoreVersion
+  interlokCommonJavadocs= project.hasProperty('interlokJavadocs') ? project.getProperty('interlokJavadocs') : javadocsBaseUrl + "/interlok-common/" + interlokCoreVersion
+  componentName='Interlok KIE'
+  organizationName = "Adaptris Ltd"
+  organizationUrl = "http://interlok.adaptris.net"
+  slf4jVersion = '1.7.25'
+  log4j2Version = "2.9.1"
+  droolsVersion='7.13.0.Final'
+}
+
+tasks.withType(Javadoc) {
+  options.addStringOption('Xdoclint:none', '-quiet')
+}
+
+ext.hostname = { ->
+  if (Os.isFamily(Os.FAMILY_WINDOWS)) {
+    return System.getenv("COMPUTERNAME")
+  }
+  return System.getenv("HOSTNAME")
+}
+
+ext.testResourcesDir = { ->
+  return "${project.projectDir}/src/test/resources".replaceAll("\\\\", "/")
+}
+
+ext.propertyTemplate = { dir, filename ->
+  def file = new File(dir, filename + "." + hostname())
+  if (file.exists()) {
+    return file.getName()
+  }
+  return filename
+}
+
+sourceCompatibility = 1.8
+group   = 'com.adaptris'
+version = releaseVersion
+def versionDir = "$buildDir/version"
+
+repositories {
+  mavenCentral()
+  maven { url "$defaultNexusRepo" }
+  maven { url "$nexusBaseUrl/content/groups/public" }
+  maven { url "$nexusBaseUrl/content/repositories/snapshots" }
+  maven { url "$nexusBaseUrl/content/content/repositories/releases" }
+}
+
+configurations {
+  javadoc {}
+  all*.exclude group: 'c3p0'
+  all*.exclude group: 'commons-logging'
+  all*.exclude group: 'javamail'
+  all*.exclude group: 'javax.mail', module: 'mail'
+  all*.exclude group: 'org.glassfish.hk2.external'
+  all*.exclude group: 'xalan', module: 'xalan'
+  all*.exclude group: 'net.sf.saxon', module: 'saxon'
+  all*.exclude group: 'org.codehaus.woodstox'
+  all*.exclude group: 'org.eclipse.jetty.orbit', module: 'javax.mail.glassfish'
+}
+
+
+dependencies {
+  compile ("com.adaptris:interlok-core:$interlokCoreVersion") { changing= true}
+  compile ("com.adaptris:interlok-common:$interlokCoreVersion") { changing= true}
+  compile ("com.thoughtworks.xstream:xstream:1.4.10")
+  compile ("org.apache.commons:commons-collections4:4.2")
+  compile ("org.drools:drools-core:$droolsVersion") {  }
+  compile ("org.drools:drools-compiler:$droolsVersion") {  }
+  compile ("org.drools:drools-compiler:$droolsVersion") {  }
+
+  // Required for KScanner, but is generally optional
+  compile "org.kie:kie-ci:$droolsVersion", optional
+
+  compile ("org.slf4j:slf4j-api:$slf4jVersion")
+
+  annotationProcessor ("com.adaptris:interlok-core-apt:$interlokCoreVersion") {changing= true}
+
+  testAnnotationProcessor ("com.adaptris:interlok-core-apt:$interlokCoreVersion") {changing= true}
+  testCompile ('junit:junit:4.12')
+
+  testCompile ("com.adaptris:interlok-stubs:$interlokCoreVersion") { changing= true}
+  testCompile ("org.apache.logging.log4j:log4j-core:$log4j2Version")
+  testCompile ("org.apache.logging.log4j:log4j-1.2-api:$log4j2Version")
+  testCompile ("org.apache.logging.log4j:log4j-api:$log4j2Version")
+  testCompile ("org.mockito:mockito-all:1.10.19")
+  // this is purely for testing kjar connections, simple kmodule based kjar.
+  // don't expect it to change, published out of kie-rule-demo sub-dir.
+  testCompile ('com.adaptris:kie-rule-demo:0.0.1-SNAPSHOT')
+
+  javadoc("com.adaptris:interlok-core-apt:$interlokCoreVersion") { changing= true}
+
+}
+
+task buildUnitTestProperties(type: Copy) {
+  def propertyFile = propertyTemplate(testResourcesDir(), "unit-tests.properties.template")
+  delete file(testResourcesDir() + "/unit-tests.properties")
+  from file(testResourcesDir() + "/" + propertyFile)
+  into (testResourcesDir())
+  rename { String fileName ->
+    fileName.replace(propertyFile, 'unit-tests.properties')
+  }
+  filter(ReplaceTokens, tokens: [JAVA_HOME: System.getProperty("java.home").replaceAll("\\\\", "/")])
+  filter(ReplaceTokens, tokens: [BASE_DIR: project.projectDir.getCanonicalPath().replaceAll("\\\\", "/")])
+  filter(ReplaceTokens, tokens: [BUILD_DIR: project.buildDir.getCanonicalPath().replaceAll("\\\\", "/")])
+}
+
+task deleteGeneratedFiles(type: Delete) {
+  delete file(testResourcesDir() + "/unit-tests.properties")
+}
+
+jacoco {
+  toolVersion="0.8.1"
+}
+
+jacocoTestReport {
+ reports {
+   xml.enabled true
+   html.enabled true
+  }
+}
+
+sourceSets {
+  main {
+    output.dir(versionDir, builtBy: 'generateVersion')
+  }
+}
+
+// Generate the META-INF/adaptris-version file
+task generateVersion {
+  doLast {
+    def versionFile = new File(new File(versionDir, 'META-INF'), 'adaptris-version')
+    versionFile.getParentFile().mkdirs()
+    ant.propertyfile(file: versionFile) {
+      entry(key: 'component.name', value: componentName)
+      entry(key: 'build.version', value: project.version)
+      entry(key: 'groupId', value: project.group)
+      entry(key: 'artifactId', value: project.name)
+      entry(key: 'build.date', value: new Date().format('yyyy-MM-dd'))
+    }
+  }
+}
+
+jar {
+  manifest {
+    attributes("Built-By": System.getProperty('user.name'),
+             "Build-Jdk": System.getProperty('java.version'),
+             "Implementation-Title": componentName,
+             "Implementation-Version": project.version,
+             "Implementation-Vendor-Id": project.group,
+             "Implementation-Vendor": organizationName)
+  }
+}
+
+javadoc {
+  configure(options) {
+      links = [
+        interlokJavadocs,
+        interlokCommonJavadocs,
+      ]
+    taglets = ["com.adaptris.taglet.ConfigTaglet", "com.adaptris.taglet.LicenseTaglet"]
+    options.addStringOption "tagletpath", configurations.javadoc.asPath
+    options.tags('apiNote:a:API Note:', 'implSpec:a:Implementation Requirements:','implNote:a:Implementation Note:')
+    title= componentName
+  }
+}
+
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    classifier = 'javadoc'
+    from javadoc.destinationDir
+}
+
+task examplesJar(type: Jar, dependsOn: test) {
+    classifier = 'examples'
+    from new File(buildDir, '/examples')
+}
+
+task sourcesJar(type: Jar, dependsOn: classes) {
+    classifier = 'sources'
+    from sourceSets.main.allSource
+}
+
+artifacts {
+    archives javadocJar
+    archives examplesJar
+    archives sourcesJar
+}
+
+publishing {
+  publications {
+    mavenJava(MavenPublication) {
+      from components.java
+
+      artifact javadocJar { classifier "javadoc" }
+      artifact examplesJar { classifier "examples" }
+      artifact sourcesJar { classifier "sources" }
+      pom.withXml {
+        asNode().appendNode("name", componentName)
+        asNode().appendNode("description", "Using KIE/Drools as Interlok services")
+        def properties = asNode().appendNode("properties")
+        properties.appendNode("target", "3.8.2+")
+        properties.appendNode("license", "false")
+        properties.appendNode("tags", "drools,jboss rules, kie")
+        properties.appendNode("externalUrl", "https://www.drools.org/learn/documentation.html")
+      }
+    }
+  }
+  repositories {
+    maven {
+      credentials {
+        username repoUsername
+        password repoPassword
+      }
+      url mavenPublishUrl
+    }
+  }
+}
+
+check.dependsOn jacocoTestReport
+processTestResources.dependsOn buildUnitTestProperties
+clean.dependsOn deleteGeneratedFiles

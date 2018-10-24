@@ -1,0 +1,46 @@
+package com.adaptris.kie.test;
+import com.adaptris.kie.test.model.*;
+
+query getComputerRecommendation()
+    $c: Computer()
+end
+
+
+rule "Mobile"
+    when
+        Person(hobbies.contains("travelling") )
+    then
+        insert(new Laptop());
+end
+
+
+rule "Gamer"
+    when
+        Person(hobbies.contains("gaming") )
+    then
+        insert(new Desktop());
+end
+
+rule "I'm going to write a screenplay; where's my checked shirt"
+    when
+        $p: Person(profession.equalsIgnoreCase("hipster"))    
+        $c: Computer()
+    then
+        $c.setOperatingSystem(Computer.OperatingSystem.Mac);
+end
+
+rule "The specifications where ambiguous"
+    when
+        $p: Person(profession.equalsIgnoreCase("developer"))    
+        $c: Computer()
+    then
+        $c.setOperatingSystem(Computer.OperatingSystem.Linux);
+end
+
+rule "*sigh*, my life is spent in powerpoint"
+    when
+        $p: Person(profession.equalsIgnoreCase("manager"))  
+        $c: Computer()
+    then
+        $c.setOperatingSystem(Computer.OperatingSystem.Windows);
+end

@@ -1,0 +1,31 @@
+package com.adaptris.kie.test;
+import com.adaptris.kie.test.model.*;
+
+rule "I'm a BabyBoomer"
+    when
+        $p: Person(yearOfBirth >= 1946 && <= 1964)    
+    then
+        $p.setGeneration(Person.Generation.BabyBoomer);
+end
+
+rule "I'm GenerationX"
+    when
+        $p: Person(yearOfBirth >= 1965 && <= 1980)    
+    then
+        $p.setGeneration(Person.Generation.GenerationX);
+end
+
+
+rule "I'm a millenial"
+    when
+        $p: Person(yearOfBirth >= 1981 && <= 1997)    
+    then
+        $p.setGeneration(Person.Generation.Millenial);
+end
+
+rule "I'm GenerationZ, or Post-millenial or whatever the hell"
+    when
+        $p: Person(yearOfBirth >= 1998)    
+    then
+        $p.setGeneration(Person.Generation.GenerationZ);
+end

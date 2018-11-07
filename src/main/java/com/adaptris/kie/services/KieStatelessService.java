@@ -20,7 +20,7 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
  */
 @XStreamAlias("kie-stateless-service")
 @AdapterComponent
-@ComponentProfile(summary = "Stateless KIE/Drools Engine execution", tag = "service,drools,kie", recommended =
+@ComponentProfile(summary = "Stateless KIE/Drools Engine execution", tag = "service,drools,kie", since = "3.8.2", recommended =
 {
     KieConnection.class
 })

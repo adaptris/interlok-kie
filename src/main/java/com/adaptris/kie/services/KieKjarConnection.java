@@ -10,6 +10,7 @@ import org.kie.api.builder.ReleaseId;
 import org.kie.api.runtime.KieContainer;
 
 import com.adaptris.annotation.AdvancedConfig;
+import com.adaptris.annotation.ComponentProfile;
 import com.adaptris.annotation.InputFieldDefault;
 import com.adaptris.core.CoreException;
 import com.adaptris.core.util.Args;
@@ -22,12 +23,14 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
  * 
  * <p>
  * If you have a custom repository then you may need to override maven behaviour with a custom settings.xml using the system
- * property {@code kie.maven.settings.custom}.
+ * property {@code kie.maven.settings.custom}. If you want to use a {@code KieScanner} then you will need to have the {@code kie-ci}
+ * artifact as well.
  * </p>
  * 
  * @config kie-kjar-connection
  */
 @XStreamAlias("kie-kjar-connection")
+@ComponentProfile(summary = "Drools connection that builds up a KieContainer based on KieService#newReleaseId()", since = "3.8.2")
 public class KieKjarConnection extends KieConnection {
 
   private static final TimeInterval RESCAN_INTERVAL = new TimeInterval(10L, TimeUnit.MINUTES);
@@ -59,7 +62,8 @@ public class KieKjarConnection extends KieConnection {
       Args.notNull(getArtifactId(), "artifact");
       Args.notNull(getVersion(), "version");
       Args.notNull(getKieBaseName(), "kieBaseName");
-    } catch (Exception e) {
+    }
+    catch (Exception e) {
       throw ExceptionHelper.wrapCoreException(e);
     }
   }

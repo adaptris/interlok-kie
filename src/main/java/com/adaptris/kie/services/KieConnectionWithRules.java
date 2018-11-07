@@ -17,6 +17,7 @@ import org.kie.api.runtime.KieContainer;
 import org.kie.internal.io.ResourceFactory;
 
 import com.adaptris.annotation.AutoPopulated;
+import com.adaptris.annotation.ComponentProfile;
 import com.adaptris.core.CoreException;
 import com.adaptris.core.fs.FsHelper;
 import com.adaptris.core.util.Args;
@@ -30,6 +31,7 @@ import com.thoughtworks.xstream.annotations.XStreamImplicit;
  * @config kie-connection-with-rules
  */
 @XStreamAlias("kie-connection-with-rules")
+@ComponentProfile(summary = "Drools connection that builds up a KieContainer iteratively, adding the specified rules", since = "3.8.2")
 public class KieConnectionWithRules extends KieConnection {
   private static final String KIE_FS_PREFIX = "src/main/resources/";
 

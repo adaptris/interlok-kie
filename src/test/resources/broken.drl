@@ -1,0 +1,10 @@
+package com.adaptris.kie.test;
+import com.adaptris.kie.test.model.*;
+
+rule "I'm Broken cos of no ;"
+    when
+        $p: Person()    
+    then
+        $p.setGeneration(Person.Generation.Before_These_Things_Mattered)
+end
+

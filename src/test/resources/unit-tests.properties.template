@@ -1,0 +1,12 @@
+SampleConfigCase.baseDir=@BUILD_DIR@/examples
+DroolsServiceExamples.baseDir=@BUILD_DIR@/examples
+
+drools.computers.drl.url=file:///@BASE_DIR@/src/test/resources/choose-computer.drl
+drools.generation.drl.url=file:///@BASE_DIR@/src/test/resources/assign-generation.drl
+
+drools.broken.drl.url=file:///@BASE_DIR@/src/test/resources/broken.drl
+
+drools.kjar.groupId=com.adaptris
+drools.kjar.artifactId=kie-rule-demo
+drools.kjar.version=0.0.1-SNAPSHOT
+drools.kjar.kiebase=demo

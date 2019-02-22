@@ -8,6 +8,7 @@ plugins {
   id 'jacoco'
   // Manage optional dependencies in maven pom.
   id 'nebula.optional-base' version '4.0.1'
+  id 'com.github.spotbugs' version '1.6.10'
 }
 
 ext {
@@ -27,7 +28,7 @@ ext {
   organizationName = "Adaptris Ltd"
   organizationUrl = "http://interlok.adaptris.net"
   slf4jVersion = '1.7.26'
-  log4j2Version = "2.9.1"
+  log4j2Version = "2.11.2"
   droolsVersion='7.17.0.Final'
 }
 
@@ -261,6 +262,28 @@ publishing {
     }
   }
 }
+
+spotbugs {
+  // showProgress = "true"
+  effort = "max"
+  // Ignore failures?
+  // ignoreFailures = false
+
+  // We only care about "high priority" issues...
+  reportLevel = "high"
+}
+
+// disable spotbugsTests which checks our test code..
+spotbugsTest.enabled = false
+
+tasks.withType(com.github.spotbugs.SpotBugsTask) {
+  reports {
+    xml.enabled = false
+    html.enabled = true
+  }
+}
+
+
 
 check.dependsOn jacocoTestReport
 processTestResources.dependsOn buildUnitTestProperties

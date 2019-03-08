@@ -29,7 +29,7 @@ ext {
   organizationUrl = "http://interlok.adaptris.net"
   slf4jVersion = '1.7.26'
   log4j2Version = "2.11.2"
-  droolsVersion='7.17.0.Final'
+  droolsVersion='7.18.0.Final'
 }
 
 tasks.withType(Javadoc) {

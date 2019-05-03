@@ -42,7 +42,7 @@ jobs:
       - run:
           name: Build kie-rule-demo
           command: |
-            cd kie-rule-demo && mvn --batch test
+            cd kie-rule-demo && mvn --batch-mode test
 
       - run:
           name: Save test results

@@ -28,7 +28,7 @@ jobs:
       # Download and cache dependencies
       - restore_cache:
           keys:
-            - dependencies-{{ .Environment.CIRCLE_JOB}}-{{ checksum "build.gradle" }}
+            - dependencies-{{ .Environment.CIRCLE_JOB}}-{{ checksum "build.gradle" }}-{{ checksum "kie-rule-demo/pom.xml" }}
             - dependencies-{{ .Environment.CIRCLE_JOB}}-
             - dependencies-
 
@@ -38,6 +38,11 @@ jobs:
           command: |
             chmod +x ./gradlew
             ./gradlew -PverboseTests=true test jacocoTestReport
+
+      - run:
+          name: Build kie-rule-demo
+          command: |
+            cd kie-rule-demo && mvn test
 
       - run:
           name: Save test results
@@ -57,7 +62,8 @@ jobs:
           paths:
             - ~/.gradle/caches
             - ~/.gradle/wrapper
-          key: dependencies-{{ .Environment.CIRCLE_JOB}}-{{ checksum "build.gradle" }}
+            - ~/.m2/repository
+          key: dependencies-{{ .Environment.CIRCLE_JOB}}-{{ checksum "build.gradle" }}-{{ checksum "kie-rule-demo/pom.xml" }}
 
   publish:
     docker:

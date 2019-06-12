@@ -111,7 +111,7 @@ dependencies {
     exclude group: 'com.google.guava', module: 'guava'
     exclude group: 'org.codehaus.plexus', module: 'plexus-utils'
   }
-  testCompile ("org.apache.httpcomponents:httpclient:4.5.8")
+  testCompile ("org.apache.httpcomponents:httpclient:4.5.9")
   testCompile ("com.google.guava:guava:28.0-jre")
   testCompile ("org.codehaus.plexus:plexus-utils:3.2.0")
 

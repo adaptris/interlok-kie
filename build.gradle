@@ -160,10 +160,6 @@ task deleteGeneratedFiles(type: Delete) {
   delete file(testResourcesDir() + "/unit-tests.properties")
 }
 
-jacoco {
-  toolVersion="0.8.3"
-}
-
 jacocoTestReport {
  reports {
    xml.enabled true

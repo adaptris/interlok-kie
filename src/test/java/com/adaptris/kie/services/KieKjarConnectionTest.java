@@ -1,8 +1,13 @@
 package com.adaptris.kie.services;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 import java.io.InputStream;
 import java.util.concurrent.TimeUnit;
-
+import org.junit.Test;
 import com.adaptris.core.AdaptrisMessage;
 import com.adaptris.core.BaseCase;
 import com.adaptris.core.CoreException;
@@ -17,12 +22,11 @@ public class KieKjarConnectionTest extends BaseCase {
   protected static final String ARTIFACT_ID = "drools.kjar.artifactId";
   protected static final String VERSION = "drools.kjar.version";
   protected static final String KIE_BASE = "drools.kjar.kiebase";
-
   @Override
-  protected void setUp() throws Exception {
+  public boolean isAnnotatedForJunit4() {
+    return true;
   }
-
-
+  @Test
   public void testService_RescanEnabled() throws Exception {
     KieServiceImpl service = new KieService()
         .withConnection(new KieKjarConnection()
@@ -42,6 +46,7 @@ public class KieKjarConnectionTest extends BaseCase {
     }
   }
 
+  @Test
   public void testService_RescanDisabled() throws Exception {
     KieServiceImpl service = new KieService()
         .withConnection(new KieKjarConnection()
@@ -61,6 +66,7 @@ public class KieKjarConnectionTest extends BaseCase {
     }
   }
 
+  @Test
   public void testRescan() throws Exception {
     KieKjarConnection conn = new KieKjarConnection();
     assertNull(conn.getRescan());
@@ -70,6 +76,7 @@ public class KieKjarConnectionTest extends BaseCase {
     assertTrue(conn.rescan());
   }
 
+  @Test
   public void testRescanInterval() throws Exception {
     KieKjarConnection conn = new KieKjarConnection();
     assertNull(conn.getRescanInterval());
@@ -80,6 +87,7 @@ public class KieKjarConnectionTest extends BaseCase {
     assertEquals(t.toMilliseconds(), conn.rescanIntervalMillis());
   }
 
+  @Test
   public void testLifecycle() throws Exception {
     KieKjarConnection conn = new KieKjarConnection();
     try {

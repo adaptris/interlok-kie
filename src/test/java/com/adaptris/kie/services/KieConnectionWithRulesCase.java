@@ -1,12 +1,13 @@
 package com.adaptris.kie.services;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 import java.io.InputStream;
 import java.util.Arrays;
-
+import org.junit.Test;
 import org.kie.api.KieBase;
 import org.kie.api.runtime.KieSession;
 import org.w3c.dom.Document;
-
 import com.adaptris.core.AdaptrisMessage;
 import com.adaptris.core.CoreException;
 import com.adaptris.core.DefaultMarshaller;
@@ -20,12 +21,11 @@ import com.adaptris.kie.test.model.Person;
 import com.adaptris.util.text.xml.XPath;
 
 public abstract class KieConnectionWithRulesCase extends KieServiceExample {
-
   @Override
-  protected void setUp() throws Exception {
+  public boolean isAnnotatedForJunit4() {
+    return true;
   }
-
-
+  @Test
   public void testUncheckedLifecycle() throws Exception {
     KieServiceImpl.uncheckedLifecycle(Arrays.asList(new ComponentLifetimeSession()), e -> {
       LifecycleHelper.initAndStart(e);
@@ -62,6 +62,7 @@ public abstract class KieConnectionWithRulesCase extends KieServiceExample {
     }
   }
 
+  @Test
   public void testLifecycle() throws Exception {
     KieServiceImpl service = addConnection(createForTests());
     try {
@@ -75,6 +76,7 @@ public abstract class KieConnectionWithRulesCase extends KieServiceExample {
     LifecycleHelper.stopAndClose(LifecycleHelper.initAndStart(service));
   }
 
+  @Test
   public void testService_WithQuery() throws Exception {
     KieServiceImpl service = addConnection(createForTests())
         .withExecutionContext(new SimpleExecutionContext().withQueryName("getComputerRecommendation")
@@ -101,6 +103,7 @@ public abstract class KieConnectionWithRulesCase extends KieServiceExample {
     }
   }
 
+  @Test
   public void testService_WithoutQuery() throws Exception {
     KieServiceImpl service = addConnection(createForTests())
         .withExecutionContext(new SimpleExecutionContext().withInsertId("payload"));
@@ -126,6 +129,7 @@ public abstract class KieConnectionWithRulesCase extends KieServiceExample {
     }
   }
 
+  @Test
   public void testRule_CompileFails() throws Exception {
     KieServiceImpl service = createForTests()
         .withConnection(new KieConnectionWithRules().withRules(PROPERTIES.getProperty(BROKEN_DRL)))

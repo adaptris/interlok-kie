@@ -9,6 +9,7 @@ plugins {
   // Manage optional dependencies in maven pom.
   id 'nebula.optional-base' version '5.0.3'
   id 'com.github.spotbugs' version '3.0.0'
+  id 'org.owasp.dependencycheck' version '5.3.2.1'
 }
 
 ext {
@@ -29,7 +30,7 @@ ext {
   organizationUrl = "http://interlok.adaptris.net"
   slf4jVersion = '1.7.30'
   log4j2Version = "2.13.1"
-  droolsVersion='7.35.0.Final'
+  droolsVersion='7.36.0.20200331'
 }
 
 tasks.withType(Javadoc) {
@@ -305,6 +306,9 @@ spotbugsMain {
 spotbugsTest.enabled = false
 
 
+dependencyCheck  {
+  suppressionFiles= [ "https://raw.githubusercontent.com/adaptris/interlok/develop/gradle/owasp-exclude.xml" ]
+}
 
 check.dependsOn jacocoTestReport
 processTestResources.dependsOn buildUnitTestProperties

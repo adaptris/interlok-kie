@@ -8,7 +8,8 @@ plugins {
   id 'jacoco'
   // Manage optional dependencies in maven pom.
   id 'nebula.optional-base' version '5.0.3'
-  id 'com.github.spotbugs' version '3.0.0'
+  id 'com.github.spotbugs' version '4.0.5'
+  id 'org.owasp.dependencycheck' version '5.3.2.1'
 }
 
 ext {
@@ -28,8 +29,8 @@ ext {
   organizationName = "Adaptris Ltd"
   organizationUrl = "http://interlok.adaptris.net"
   slf4jVersion = '1.7.30'
-  log4j2Version = "2.13.0"
-  droolsVersion='7.33.0.Final'
+  log4j2Version = "2.13.2"
+  droolsVersion='7.36.1.Final'
 }
 
 tasks.withType(Javadoc) {
@@ -97,6 +98,11 @@ configurations {
   all*.exclude group: 'net.sf.saxon', module: 'saxon'
   all*.exclude group: 'org.codehaus.woodstox'
   all*.exclude group: 'org.eclipse.jetty.orbit', module: 'javax.mail.glassfish'
+  // INTERLOK-3197 exclude old javax.mail
+  all*.exclude group: 'com.sun.mail', module: 'javax.mail'
+  all*.exclude group: 'javax.validation', module: 'validation-api'
+  all*.exclude group: 'javax.activation', module: 'activation'
+  all*.exclude group: 'javax.activation', module: 'javax.activation-api'
 }
 
 configurations.all {
@@ -106,7 +112,7 @@ configurations.all {
 dependencies {
   compile ("com.adaptris:interlok-core:$interlokCoreVersion") { changing= true}
   compile ("com.adaptris:interlok-common:$interlokCoreVersion") { changing= true}
-  compile ("com.thoughtworks.xstream:xstream:1.4.11")
+  compile ("com.thoughtworks.xstream:xstream:1.4.12")
   compile ("org.apache.commons:commons-collections4:4.4")
   compile ("org.drools:drools-core:$droolsVersion") {  }
   compile ("org.drools:drools-compiler:$droolsVersion") {  }
@@ -129,8 +135,8 @@ dependencies {
     exclude group: 'com.google.guava', module: 'guava'
     exclude group: 'org.codehaus.plexus', module: 'plexus-utils'
   }
-  testCompile ("org.apache.httpcomponents:httpclient:4.5.11")
-  testCompile ("com.google.guava:guava:28.2-jre")
+  testCompile ("org.apache.httpcomponents:httpclient:4.5.12")
+  testCompile ("com.google.guava:guava:29.0-jre")
   testCompile ("org.codehaus.plexus:plexus-utils:3.3.0")
 
   // this is purely for testing kjar connections, simple kmodule based kjar.
@@ -277,27 +283,32 @@ publishing {
   }
 }
 
-spotbugs {
+spotbugsMain {
+  effort = "max"
+  reportLevel = "high"
   // showProgress = "true"
   effort = "max"
   // Ignore failures?
   // ignoreFailures = false
-
-  // We only care about "high priority" issues...
-  reportLevel = "high"
+  reports {
+    xml {
+      enabled = false
+    }
+    html {
+      enabled = true
+    }
+  }
+  // includeFilter = new File("$rootDir/gradle/spotbugs-filter.xml")
+  // excludeFilter = new File("$rootDir/gradle/spotbugs-exclude.xml")
 }
 
 // disable spotbugsTests which checks our test code..
 spotbugsTest.enabled = false
 
-tasks.withType(com.github.spotbugs.SpotBugsTask) {
-  reports {
-    xml.enabled = false
-    html.enabled = true
-  }
+
+dependencyCheck  {
+  suppressionFiles= [ "https://raw.githubusercontent.com/adaptris/interlok/develop/gradle/owasp-exclude.xml" ]
 }
-
-
 
 check.dependsOn jacocoTestReport
 processTestResources.dependsOn buildUnitTestProperties

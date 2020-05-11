@@ -7,3 +7,9 @@ update_configs:
     default_reviewers:
       - quotidian-ennui
       - aaron-mcgrath-adp
+  - package_manager : "java:maven"
+    directory: "/kie-rule-demo"
+    update_schedule: "daily"
+    default_reviewers:
+     - quotidian-ennui
+     - aaron-mcgrath-adp

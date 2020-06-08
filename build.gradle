@@ -115,7 +115,7 @@ dependencies {
   compile ("org.apache.commons:commons-collections4:4.4")
   compile ("org.drools:drools-core:$droolsVersion") {  }
   compile ("org.drools:drools-compiler:$droolsVersion") {  }
-  compile ("commons-codec:commons-codec:1.13")
+  compile ("commons-codec:commons-codec:1.14")
 
   compile ("org.slf4j:slf4j-api:$slf4jVersion")
 

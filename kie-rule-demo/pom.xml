@@ -24,7 +24,11 @@
       <artifactId>drools-core</artifactId>
       <version>${drools.version}</version>
     </dependency>
-
+    <dependency>
+      <groupId>commons-codec</groupId>
+      <artifactId>commons-codec</artifactId>
+      <version>1.13</version>
+    </dependency>
   </dependencies>
   <distributionManagement>
     <snapshotRepository>

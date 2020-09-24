@@ -111,7 +111,7 @@ configurations.all {
 dependencies {
   compile ("com.adaptris:interlok-core:$interlokCoreVersion") { changing= true}
   compile ("com.adaptris:interlok-common:$interlokCoreVersion") { changing= true}
-  compile ("com.thoughtworks.xstream:xstream:1.4.12")
+  compile ("com.thoughtworks.xstream:xstream:1.4.13")
   compile ("org.apache.commons:commons-collections4:4.4")
   compile ("org.drools:drools-core:$droolsVersion") {  }
   compile ("org.drools:drools-compiler:$droolsVersion") {  }

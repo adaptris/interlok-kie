@@ -8,8 +8,8 @@ plugins {
   id 'jacoco'
   // Manage optional dependencies in maven pom.
   id 'nebula.optional-base' version '5.0.3'
-  id 'com.github.spotbugs' version '4.5.0'
-  id 'org.owasp.dependencycheck' version '5.3.2.1'
+  id 'com.github.spotbugs' version '4.5.1'
+  id 'org.owasp.dependencycheck' version '6.0.3'
 }
 
 ext {
@@ -29,7 +29,7 @@ ext {
   organizationName = "Adaptris Ltd"
   organizationUrl = "http://interlok.adaptris.net"
   slf4jVersion = '1.7.30'
-  droolsVersion='7.42.0.Final'
+  droolsVersion='7.45.0.Final'
 }
 
 tasks.withType(Javadoc) {
@@ -111,18 +111,18 @@ configurations.all {
 dependencies {
   compile ("com.adaptris:interlok-core:$interlokCoreVersion") { changing= true}
   compile ("com.adaptris:interlok-common:$interlokCoreVersion") { changing= true}
-  compile ("com.thoughtworks.xstream:xstream:1.4.12")
+  compile ("com.thoughtworks.xstream:xstream:1.4.14")
   compile ("org.apache.commons:commons-collections4:4.4")
   compile ("org.drools:drools-core:$droolsVersion") {  }
   compile ("org.drools:drools-compiler:$droolsVersion") {  }
-  compile ("commons-codec:commons-codec:1.14")
+  compile ("commons-codec:commons-codec:1.15")
 
   compile ("org.slf4j:slf4j-api:$slf4jVersion")
 
   annotationProcessor ("com.adaptris:interlok-core-apt:$interlokCoreVersion") {changing= true}
 
   testAnnotationProcessor ("com.adaptris:interlok-core-apt:$interlokCoreVersion") {changing= true}
-  testCompile ('junit:junit:4.13')
+  testCompile ('junit:junit:4.13.1')
 
   testCompile "org.slf4j:slf4j-simple:$slf4jVersion"
   // exclude any log4j dependencies so that we can just use slf4j simple.
@@ -131,16 +131,16 @@ dependencies {
     changing= true
     exclude group: "org.apache.logging.log4j"
   }
-  testCompile ("org.mockito:mockito-core:3.5.9")
-  testCompile ("org.mockito:mockito-inline:3.5.9")
+  testCompile ("org.mockito:mockito-core:3.6.0")
+  testCompile ("org.mockito:mockito-inline:3.6.0")
   // Required for KScanner, but is generally optional
   testCompile ("org.kie:kie-ci:$droolsVersion") {
     exclude group: 'org.apache.httpcomponents', module: 'httpclient'
     exclude group: 'com.google.guava', module: 'guava'
     exclude group: 'org.codehaus.plexus', module: 'plexus-utils'
   }
-  testCompile ("org.apache.httpcomponents:httpclient:4.5.12")
-  testCompile ("com.google.guava:guava:29.0-jre")
+  testCompile ("org.apache.httpcomponents:httpclient:4.5.13")
+  testCompile ("com.google.guava:guava:30.0-jre")
   testCompile ("org.codehaus.plexus:plexus-utils:3.3.0")
 
   // this is purely for testing kjar connections, simple kmodule based kjar.

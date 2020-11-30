@@ -8,7 +8,7 @@
   <version>0.0.1-SNAPSHOT</version>
 
   <properties>
-    <drools.version>7.42.0.Final</drools.version>
+    <drools.version>7.45.0.Final</drools.version>
     <adaptris.remote.repo.url>https://nexus.adaptris.net/nexus/content/repositories/snapshots</adaptris.remote.repo.url>
     <isRelease>false</isRelease>
   </properties>
@@ -27,7 +27,7 @@
     <dependency>
       <groupId>commons-codec</groupId>
       <artifactId>commons-codec</artifactId>
-      <version>1.14</version>
+      <version>1.15</version>
     </dependency>
   </dependencies>
   <distributionManagement>
@@ -53,7 +53,7 @@
       <plugin>
         <groupId>org.kie</groupId>
         <artifactId>kie-maven-plugin</artifactId>
-        <version>7.42.0.Final</version>
+        <version>7.45.0.Final</version>
         <extensions>true</extensions>
       </plugin>
       <plugin>
@@ -77,7 +77,7 @@
         <plugin>
           <groupId>org.kie</groupId>
           <artifactId>kie-maven-plugin</artifactId>
-          <version>7.42.0.Final</version>
+          <version>7.45.0.Final</version>
           <extensions>true</extensions>
         </plugin>
       </plugins>

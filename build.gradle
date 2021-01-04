@@ -274,6 +274,7 @@ publishing {
         properties.appendNode("license", "false")
         properties.appendNode("tags", "drools,jboss rules,kie")
         properties.appendNode("externalUrl", "https://www.drools.org/learn/documentation.html")
+        properties.appendNode("repository", "https://github.com/adaptris/interlok-kie")
       }
     }
   }

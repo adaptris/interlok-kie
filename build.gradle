@@ -132,7 +132,7 @@ dependencies {
     changing= true
     exclude group: "org.apache.logging.log4j"
   }
-  testCompile ("org.mockito:mockito-core:3.6.28")
+  testCompile ("org.mockito:mockito-core:3.7.0")
   testCompile ("org.mockito:mockito-inline:3.6.28")
   // Required for KScanner, but is generally optional
   testCompile ("org.kie:kie-ci:$droolsVersion") {

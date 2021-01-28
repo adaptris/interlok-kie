@@ -29,7 +29,8 @@ ext {
   organizationName = "Adaptris Ltd"
   organizationUrl = "http://interlok.adaptris.net"
   slf4jVersion = '1.7.30'
-  droolsVersion='7.47.0.Final'
+  mockitoVersion = '3.7.0'
+  droolsVersion = '7.47.0.Final'
 }
 
 tasks.withType(Javadoc) {
@@ -132,8 +133,8 @@ dependencies {
     changing= true
     exclude group: "org.apache.logging.log4j"
   }
-  testCompile ("org.mockito:mockito-core:3.7.0")
-  testCompile ("org.mockito:mockito-inline:3.7.0")
+  testCompile ("org.mockito:mockito-core:$mockitoVersion")
+  testCompile ("org.mockito:mockito-inline:$mockitoVersion")
   // Required for KScanner, but is generally optional
   testCompile ("org.kie:kie-ci:$droolsVersion") {
     exclude group: 'org.apache.httpcomponents', module: 'httpclient'

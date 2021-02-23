@@ -25,7 +25,7 @@ ext {
 
   interlokJavadocs= project.hasProperty('interlokJavadocs') ? project.getProperty('interlokJavadocs') : javadocsBaseUrl + "/interlok-core/" + interlokCoreVersion
   interlokCommonJavadocs= project.hasProperty('interlokCommonJavadocs') ? project.getProperty('interlokCommonJavadocs') : javadocsBaseUrl + "/interlok-common/" + interlokCoreVersion
-  componentName='Interlok Rules/KIE'
+  componentName='Interlok Application/KIE'
   componentDesc='Using KIE/Drools with Interlok services'
   organizationName = "Adaptris Ltd"
   organizationUrl = "http://interlok.adaptris.net"

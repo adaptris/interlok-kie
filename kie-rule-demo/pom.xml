@@ -8,7 +8,7 @@
   <version>0.0.1-SNAPSHOT</version>
 
   <properties>
-    <drools.version>7.51.0.Final</drools.version>
+    <drools.version>7.52.0.t20210322</drools.version>
     <adaptris.remote.repo.url>https://nexus.adaptris.net/nexus/content/repositories/snapshots</adaptris.remote.repo.url>
     <isRelease>false</isRelease>
   </properties>

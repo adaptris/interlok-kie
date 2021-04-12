@@ -7,14 +7,14 @@ plugins {
   id 'maven-publish'
   id 'jacoco'
   // Manage optional dependencies in maven pom.
-  id 'nebula.optional-base' version '5.0.3'
-  id 'com.github.spotbugs' version '4.6.0'
-  id 'org.owasp.dependencycheck' version '6.0.5'
+  id 'nebula.optional-base' version '6.0.0'
+  id 'com.github.spotbugs' version '4.7.0'
+  id 'org.owasp.dependencycheck' version '6.1.2'
 }
 
 ext {
-  interlokCoreVersion = project.hasProperty('interlokCoreVersion') ? project.getProperty('interlokCoreVersion') : '3.12-SNAPSHOT'
-  releaseVersion = project.hasProperty('releaseVersion') ? project.getProperty('releaseVersion') : '3.12-SNAPSHOT'
+  interlokCoreVersion = project.hasProperty('interlokCoreVersion') ? project.getProperty('interlokCoreVersion') : '4.0-SNAPSHOT'
+  releaseVersion = project.hasProperty('releaseVersion') ? project.getProperty('releaseVersion') : '4.0-SNAPSHOT'
   nexusBaseUrl = project.hasProperty('nexusBaseUrl') ? project.getProperty('nexusBaseUrl') : 'https://nexus.adaptris.net/nexus'
   mavenPublishUrl = project.hasProperty('mavenPublishUrl') ? project.getProperty('mavenPublishUrl') : nexusBaseUrl + '/content/repositories/snapshots'
   javadocsBaseUrl = nexusBaseUrl + "/content/sites/javadocs/com/adaptris"
@@ -25,11 +25,13 @@ ext {
 
   interlokJavadocs= project.hasProperty('interlokJavadocs') ? project.getProperty('interlokJavadocs') : javadocsBaseUrl + "/interlok-core/" + interlokCoreVersion
   interlokCommonJavadocs= project.hasProperty('interlokCommonJavadocs') ? project.getProperty('interlokCommonJavadocs') : javadocsBaseUrl + "/interlok-common/" + interlokCoreVersion
-  componentName='Interlok KIE'
+  componentName='Interlok Application/KIE'
+  componentDesc='Using KIE/Drools with Interlok services'
   organizationName = "Adaptris Ltd"
   organizationUrl = "http://interlok.adaptris.net"
   slf4jVersion = '1.7.30'
-  droolsVersion='7.47.0.Final'
+  mockitoVersion = '3.8.0'
+  droolsVersion = '7.51.0.Final'
 }
 
 tasks.withType(Javadoc) {
@@ -73,8 +75,8 @@ ext.buildInfo = { ->
     }
 }
 
-sourceCompatibility = JavaVersion.VERSION_1_8
-targetCompatibility = JavaVersion.VERSION_1_8
+sourceCompatibility = JavaVersion.VERSION_11
+targetCompatibility = JavaVersion.VERSION_11
 group   = 'com.adaptris'
 version = releaseVersion
 def versionDir = "$buildDir/version"
@@ -103,6 +105,9 @@ configurations {
   all*.exclude group: 'javax.validation', module: 'validation-api'
   all*.exclude group: 'javax.activation', module: 'activation'
   all*.exclude group: 'javax.activation', module: 'javax.activation-api'
+
+  // INTERLOK-3740 switch from jcraft to com.github.mwiede jsch fork.
+  all*.exclude group: 'com.jcraft', module: 'jsch'
 }
 
 configurations.all {
@@ -112,7 +117,7 @@ configurations.all {
 dependencies {
   compile ("com.adaptris:interlok-core:$interlokCoreVersion") { changing= true}
   compile ("com.adaptris:interlok-common:$interlokCoreVersion") { changing= true}
-  compile ("com.thoughtworks.xstream:xstream:1.4.15")
+  compile ("com.thoughtworks.xstream:xstream:1.4.16")
   compile ("org.apache.commons:commons-collections4:4.4")
   compile ("org.drools:drools-core:$droolsVersion") {  }
   compile ("org.drools:drools-compiler:$droolsVersion") {  }
@@ -123,7 +128,7 @@ dependencies {
   annotationProcessor ("com.adaptris:interlok-core-apt:$interlokCoreVersion") {changing= true}
 
   testAnnotationProcessor ("com.adaptris:interlok-core-apt:$interlokCoreVersion") {changing= true}
-  testCompile ('junit:junit:4.13.1')
+  testCompile ('junit:junit:4.13.2')
 
   testCompile "org.slf4j:slf4j-simple:$slf4jVersion"
   // exclude any log4j dependencies so that we can just use slf4j simple.
@@ -132,8 +137,8 @@ dependencies {
     changing= true
     exclude group: "org.apache.logging.log4j"
   }
-  testCompile ("org.mockito:mockito-core:3.7.0")
-  testCompile ("org.mockito:mockito-inline:3.7.0")
+  testCompile ("org.mockito:mockito-core:$mockitoVersion")
+  testCompile ("org.mockito:mockito-inline:$mockitoVersion")
   // Required for KScanner, but is generally optional
   testCompile ("org.kie:kie-ci:$droolsVersion") {
     exclude group: 'org.apache.httpcomponents', module: 'httpclient'
@@ -141,7 +146,7 @@ dependencies {
     exclude group: 'org.codehaus.plexus', module: 'plexus-utils'
   }
   testCompile ("org.apache.httpcomponents:httpclient:4.5.13")
-  testCompile ("com.google.guava:guava:30.1-jre")
+  testCompile ("com.google.guava:guava:30.1.1-jre")
   testCompile ("org.codehaus.plexus:plexus-utils:3.3.0")
 
   // this is purely for testing kjar connections, simple kmodule based kjar.
@@ -191,6 +196,7 @@ task generateVersion {
     versionFile.getParentFile().mkdirs()
     ant.propertyfile(file: versionFile) {
       entry(key: 'component.name', value: componentName)
+      entry(key: 'component.description', value: componentDesc)
       entry(key: 'build.version', value: project.version)
       entry(key: 'groupId', value: project.group)
       entry(key: 'artifactId', value: project.name)
@@ -211,6 +217,7 @@ task offlinePackageList(type: Copy) {
     }
   }
   include "package-list"
+  include "element-list"
   into offlineJavadocPackageDir
 }
 
@@ -232,6 +239,7 @@ javadoc {
     options.linksOffline(interlokCommonJavadocs, offlineJavadocPackageDir.getCanonicalPath() + "/interlok-common-$interlokCoreVersion-javadoc.jar")
     taglets = ["com.adaptris.taglet.ConfigTaglet", "com.adaptris.taglet.LicenseTaglet"]
     options.addStringOption "tagletpath", configurations.javadoc.asPath
+	options.addBooleanOption "-no-module-directories", true
     options.tags('apiNote:a:API Note:', 'implSpec:a:Implementation Requirements:','implNote:a:Implementation Note:')
     title= componentName
   }
@@ -268,7 +276,7 @@ publishing {
       artifact sourcesJar { classifier "sources" }
       pom.withXml {
         asNode().appendNode("name", componentName)
-        asNode().appendNode("description", "Using KIE/Drools with Interlok services")
+        asNode().appendNode("description", componentDesc)
         def properties = asNode().appendNode("properties")
         properties.appendNode("target", "3.8.2+")
         properties.appendNode("license", "false")

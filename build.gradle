@@ -31,7 +31,7 @@ ext {
   organizationUrl = "http://interlok.adaptris.net"
   slf4jVersion = '1.7.30'
   mockitoVersion = '3.9.0'
-  droolsVersion = '7.52.0.Final'
+  droolsVersion = '7.53.1.Final'
 }
 
 tasks.withType(Javadoc) {

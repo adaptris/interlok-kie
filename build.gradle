@@ -2,8 +2,7 @@ import org.apache.tools.ant.taskdefs.condition.Os
 import org.apache.tools.ant.filters.*
 
 plugins {
-  id 'java'
-  id 'maven'
+  id 'java-library'
   id 'maven-publish'
   id 'jacoco'
   // Manage optional dependencies in maven pom.
@@ -32,10 +31,6 @@ ext {
   slf4jVersion = '1.7.31'
   mockitoVersion = '3.11.2'
   droolsVersion = '7.56.0.Final'
-}
-
-tasks.withType(Javadoc) {
-  options.addStringOption('Xdoclint:none', '-quiet')
 }
 
 ext.hostname = { ->
@@ -81,9 +76,20 @@ group   = 'com.adaptris'
 version = releaseVersion
 def versionDir = "$buildDir/version"
 
+// Disable gradle module generation since we probably don't want
+// xxx.module files in your repository.
+tasks.withType(GenerateModuleMetadata) {
+  enabled = false
+}
+
 repositories {
   mavenCentral()
-  maven { url "$defaultNexusRepo" }
+  if (defaultNexusRepo != "unknown") {
+    maven {
+      url "$defaultNexusRepo"
+      allowInsecureProtocol true
+    }
+  }
   maven { url "$nexusBaseUrl/content/groups/public" }
   maven { url "$nexusBaseUrl/content/groups/interlok" }
 }
@@ -115,43 +121,39 @@ configurations.all {
 }
 
 dependencies {
-  compile ("com.adaptris:interlok-core:$interlokCoreVersion") { changing= true}
-  compile ("com.adaptris:interlok-common:$interlokCoreVersion") { changing= true}
-  compile ("com.thoughtworks.xstream:xstream:1.4.17")
-  compile ("org.apache.commons:commons-collections4:4.4")
-  compile ("org.drools:drools-core:$droolsVersion") {  }
-  compile ("org.drools:drools-compiler:$droolsVersion") {  }
-  compile ("commons-codec:commons-codec:1.15")
+  api ("com.adaptris:interlok-core:$interlokCoreVersion") { changing= true}
+  api ("com.adaptris:interlok-common:$interlokCoreVersion") { changing= true}
+  implementation ("com.thoughtworks.xstream:xstream:1.4.17")
+  implementation ("org.apache.commons:commons-collections4:4.4")
+  implementation ("org.drools:drools-core:$droolsVersion") {  }
+  implementation ("org.drools:drools-compiler:$droolsVersion") {  }
+  implementation ("commons-codec:commons-codec:1.15")
 
-  compile ("org.slf4j:slf4j-api:$slf4jVersion")
+  implementation ("org.slf4j:slf4j-api:$slf4jVersion")
 
   annotationProcessor ("com.adaptris:interlok-core-apt:$interlokCoreVersion") {changing= true}
 
   testAnnotationProcessor ("com.adaptris:interlok-core-apt:$interlokCoreVersion") {changing= true}
-  testCompile ('junit:junit:4.13.2')
 
-  testCompile "org.slf4j:slf4j-simple:$slf4jVersion"
-  // exclude any log4j dependencies so that we can just use slf4j simple.
-  // works around INTERLOk-3233
-  testCompile "com.adaptris:interlok-stubs:$interlokCoreVersion", {
-    changing= true
-    exclude group: "org.apache.logging.log4j"
-  }
-  testCompile ("org.mockito:mockito-core:$mockitoVersion")
-  testCompile ("org.mockito:mockito-inline:$mockitoVersion")
+  testImplementation ('junit:junit:4.13.2')
+  testImplementation ("org.slf4j:slf4j-simple:$slf4jVersion")
+  testImplementation ("com.adaptris:interlok-stubs:$interlokCoreVersion") { changing= true }
+  testImplementation ("org.mockito:mockito-core:$mockitoVersion")
+  testImplementation ("org.mockito:mockito-inline:$mockitoVersion")
+
   // Required for KScanner, but is generally optional
-  testCompile ("org.kie:kie-ci:$droolsVersion") {
+  testImplementation ("org.kie:kie-ci:$droolsVersion") {
     exclude group: 'org.apache.httpcomponents', module: 'httpclient'
     exclude group: 'com.google.guava', module: 'guava'
     exclude group: 'org.codehaus.plexus', module: 'plexus-utils'
   }
-  testCompile ("org.apache.httpcomponents:httpclient:4.5.13")
-  testCompile ("com.google.guava:guava:30.1.1-jre")
-  testCompile ("org.codehaus.plexus:plexus-utils:3.3.0")
+  testImplementation ("org.apache.httpcomponents:httpclient:4.5.13")
+  testImplementation ("com.google.guava:guava:30.1.1-jre")
+  testImplementation ("org.codehaus.plexus:plexus-utils:3.3.0")
 
   // this is purely for testing kjar connections, simple kmodule based kjar.
   // don't expect it to change, published out of kie-rule-demo sub-dir.
-  testCompile ('com.adaptris:kie-rule-demo:0.0.1-SNAPSHOT') { changing= true}
+  testImplementation ('com.adaptris:kie-rule-demo:0.0.1-SNAPSHOT') { changing= true}
 
   javadoc("com.adaptris:interlok-core-apt:$interlokCoreVersion") { changing= true}
   offlineJavadocPackages ("com.adaptris:interlok-core:$interlokCoreVersion:javadoc@jar") { changing= true}
@@ -239,7 +241,8 @@ javadoc {
     options.linksOffline(interlokCommonJavadocs, offlineJavadocPackageDir.getCanonicalPath() + "/interlok-common-$interlokCoreVersion-javadoc.jar")
     taglets = ["com.adaptris.taglet.ConfigTaglet", "com.adaptris.taglet.LicenseTaglet"]
     options.addStringOption "tagletpath", configurations.javadoc.asPath
-	options.addBooleanOption "-no-module-directories", true
+    options.addStringOption('Xdoclint:none', '-quiet')
+    options.addBooleanOption "-no-module-directories", true
     options.tags('apiNote:a:API Note:', 'implSpec:a:Implementation Requirements:','implNote:a:Implementation Note:')
     title= componentName
   }
@@ -321,7 +324,7 @@ spotbugsTest.enabled = false
 
 dependencyCheck  {
   suppressionFiles= [ "https://raw.githubusercontent.com/adaptris/interlok/develop/gradle/owasp-exclude.xml" ]
-  skipConfigurations = [ "antSql", "spotbugs", "umlDoclet", "offlineJavadocPackages", "javadoc", "jacocoAnt", "jacocoAgent", "spotbugsPlugins", "spotbugsSlf4j" ]
+  scanConfigurations = [ "api", "compileClasspath", "runtimeClasspath" ]
   formats = [ "HTML", "JUNIT" ]
   junitFailOnCVSS = 7.0
   failBuildOnCVSS = 7.0

@@ -7,13 +7,13 @@ plugins {
   id 'jacoco'
   // Manage optional dependencies in maven pom.
   id 'nebula.optional-base' version '7.0.0'
-  id 'com.github.spotbugs' version '4.7.9'
-  id 'org.owasp.dependencycheck' version '6.5.0.1'
+  id 'com.github.spotbugs' version '5.0.5'
+  id 'org.owasp.dependencycheck' version '6.5.3'
 }
 
 ext {
-  interlokCoreVersion = project.hasProperty('interlokCoreVersion') ? project.getProperty('interlokCoreVersion') : '4.3-SNAPSHOT'
-  releaseVersion = project.hasProperty('releaseVersion') ? project.getProperty('releaseVersion') : '4.3-SNAPSHOT'
+  interlokCoreVersion = project.hasProperty('interlokCoreVersion') ? project.getProperty('interlokCoreVersion') : '4.4-SNAPSHOT'
+  releaseVersion = project.hasProperty('releaseVersion') ? project.getProperty('releaseVersion') : '4.4-SNAPSHOT'
   nexusBaseUrl = project.hasProperty('nexusBaseUrl') ? project.getProperty('nexusBaseUrl') : 'https://nexus.adaptris.net/nexus'
   mavenPublishUrl = project.hasProperty('mavenPublishUrl') ? project.getProperty('mavenPublishUrl') : nexusBaseUrl + '/content/repositories/snapshots'
   javadocsBaseUrl = nexusBaseUrl + "/content/sites/javadocs/com/adaptris"
@@ -28,9 +28,9 @@ ext {
   componentDesc='Using KIE/Drools with Interlok services'
   organizationName = "Adaptris Ltd"
   organizationUrl = "http://interlok.adaptris.net"
-  slf4jVersion = '1.7.32'
-  mockitoVersion = '4.0.0'
-  droolsVersion = '7.61.0.Final'
+  slf4jVersion = '1.7.35'
+  mockitoVersion = '4.3.1'
+  droolsVersion = '7.64.0.Final'
 }
 
 ext.hostname = { ->
@@ -133,7 +133,7 @@ configurations.all {
 dependencies {
   api ("com.adaptris:interlok-core:$interlokCoreVersion") { changing= true}
   api ("com.adaptris:interlok-common:$interlokCoreVersion") { changing= true}
-  implementation ("com.thoughtworks.xstream:xstream:1.4.18")
+  implementation ("com.thoughtworks.xstream:xstream:1.4.19")
   implementation ("org.apache.commons:commons-collections4:4.4")
   implementation ("org.drools:drools-core:$droolsVersion") {  }
   implementation ("org.drools:drools-compiler:$droolsVersion") {  }
@@ -290,6 +290,7 @@ publishing {
       pom.withXml {
         asNode().appendNode("name", componentName)
         asNode().appendNode("description", componentDesc)
+		asNode().appendNode("url", "https://interlok.adaptris.net/interlok-docs/#/")
         def properties = asNode().appendNode("properties")
         properties.appendNode("target", "3.8.2+")
         properties.appendNode("license", "false")
@@ -313,20 +314,15 @@ publishing {
 spotbugsMain {
   effort = "max"
   reportLevel = "high"
-  // showProgress = "true"
-  effort = "max"
-  // Ignore failures?
-  // ignoreFailures = false
   reports {
     xml {
-      enabled = false
+      required.set(false)
     }
     html {
-      enabled = true
+      required.set(true)
+      stylesheet = 'default.xsl'
     }
   }
-  // includeFilter = new File("$rootDir/gradle/spotbugs-filter.xml")
-  // excludeFilter = new File("$rootDir/gradle/spotbugs-exclude.xml")
 }
 
 // disable spotbugsTests which checks our test code..

@@ -7,13 +7,13 @@ plugins {
   id 'jacoco'
   // Manage optional dependencies in maven pom.
   id 'nebula.optional-base' version '7.0.0'
-  id 'com.github.spotbugs' version '5.0.12'
-  id 'org.owasp.dependencycheck' version '7.2.1'
+  id 'com.github.spotbugs' version '5.0.13'
+  id 'org.owasp.dependencycheck' version '7.4.4'
 }
 
 ext {
-  interlokCoreVersion = project.hasProperty('interlokCoreVersion') ? project.getProperty('interlokCoreVersion') : '4.6-SNAPSHOT'
-  releaseVersion = project.hasProperty('releaseVersion') ? project.getProperty('releaseVersion') : '4.6-SNAPSHOT'
+  interlokCoreVersion = project.hasProperty('interlokCoreVersion') ? project.getProperty('interlokCoreVersion') : '4.7-SNAPSHOT'
+  releaseVersion = project.hasProperty('releaseVersion') ? project.getProperty('releaseVersion') : '4.7-SNAPSHOT'
   nexusBaseUrl = project.hasProperty('nexusBaseUrl') ? project.getProperty('nexusBaseUrl') : 'https://nexus.adaptris.net/nexus'
   mavenPublishUrl = project.hasProperty('mavenPublishUrl') ? project.getProperty('mavenPublishUrl') : nexusBaseUrl + '/content/repositories/snapshots'
   javadocsBaseUrl = nexusBaseUrl + "/content/sites/javadocs/com/adaptris"
@@ -29,7 +29,7 @@ ext {
   organizationName = "Adaptris Ltd"
   organizationUrl = "http://interlok.adaptris.net"
   slf4jVersion = '2.0.3'
-  mockitoVersion = '4.8.0'
+  mockitoVersion = '4.9.0'
   droolsVersion = '7.73.0.Final'
 }
 
@@ -133,7 +133,7 @@ configurations.all {
 dependencies {
   api ("com.adaptris:interlok-core:$interlokCoreVersion") { changing= true}
   api ("com.adaptris:interlok-common:$interlokCoreVersion") { changing= true}
-  implementation ("com.thoughtworks.xstream:xstream:1.4.19")
+  implementation ("com.thoughtworks.xstream:xstream:1.4.20")
   implementation ("org.apache.commons:commons-collections4:4.4")
   implementation ("org.drools:drools-core:$droolsVersion") {  }
   implementation ("org.drools:drools-compiler:$droolsVersion") {  }

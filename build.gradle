@@ -159,7 +159,7 @@ dependencies {
   }
   testImplementation ("org.apache.httpcomponents:httpclient:4.5.13")
   testImplementation ("com.google.guava:guava:31.1-jre")
-  testImplementation ("org.codehaus.plexus:plexus-utils:3.4.2")
+  testImplementation ("org.codehaus.plexus:plexus-utils:3.5.1")
 
   // this is purely for testing kjar connections, simple kmodule based kjar.
   // don't expect it to change, published out of kie-rule-demo sub-dir.

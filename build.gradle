@@ -7,13 +7,13 @@ plugins {
   id 'jacoco'
   // Manage optional dependencies in maven pom.
   id 'nebula.optional-base' version '7.0.0'
-  id 'com.github.spotbugs' version '5.0.13'
-  id 'org.owasp.dependencycheck' version '7.4.4'
+  id 'com.github.spotbugs' version '5.0.14'
+  id 'org.owasp.dependencycheck' version '8.2.1'
 }
 
 ext {
-  interlokCoreVersion = project.hasProperty('interlokCoreVersion') ? project.getProperty('interlokCoreVersion') : '4.7-SNAPSHOT'
-  releaseVersion = project.hasProperty('releaseVersion') ? project.getProperty('releaseVersion') : '4.7-SNAPSHOT'
+  interlokCoreVersion = project.hasProperty('interlokCoreVersion') ? project.getProperty('interlokCoreVersion') : '4.8-SNAPSHOT'
+  releaseVersion = project.hasProperty('releaseVersion') ? project.getProperty('releaseVersion') : '4.8-SNAPSHOT'
   nexusBaseUrl = project.hasProperty('nexusBaseUrl') ? project.getProperty('nexusBaseUrl') : 'https://nexus.adaptris.net/nexus'
   mavenPublishUrl = project.hasProperty('mavenPublishUrl') ? project.getProperty('mavenPublishUrl') : nexusBaseUrl + '/content/repositories/snapshots'
   javadocsBaseUrl = nexusBaseUrl + "/content/sites/javadocs/com/adaptris"
@@ -157,9 +157,9 @@ dependencies {
     exclude group: 'com.google.guava', module: 'guava'
     exclude group: 'org.codehaus.plexus', module: 'plexus-utils'
   }
-  testImplementation ("org.apache.httpcomponents:httpclient:4.5.13")
+  testImplementation ("org.apache.httpcomponents:httpclient:4.5.14")
   testImplementation ("com.google.guava:guava:31.1-jre")
-  testImplementation ("org.codehaus.plexus:plexus-utils:3.4.2")
+  testImplementation ("org.codehaus.plexus:plexus-utils:3.5.1")
 
   // this is purely for testing kjar connections, simple kmodule based kjar.
   // don't expect it to change, published out of kie-rule-demo sub-dir.
@@ -336,6 +336,7 @@ dependencyCheck  {
   failBuildOnCVSS = 7.0
   analyzers {
     assemblyEnabled=false
+    knownExploitedURL=project.findProperty('dependencyCheckKnownExploitedURL')
   }
 }
 

@@ -5,9 +5,9 @@ import java.io.OutputStream;
 import com.adaptris.core.AdaptrisMessage;
 import com.adaptris.core.AdaptrisMessageFactory;
 import com.adaptris.core.DefaultMarshaller;
-import com.adaptris.core.ServiceCase;
+import com.adaptris.interlok.junit.scaffolding.services.ExampleServiceCase;
 
-public abstract class KieServiceExample extends ServiceCase {
+public abstract class KieServiceExample extends ExampleServiceCase {
 
   private static final String BASE_DIR_KEY = "DroolsServiceExamples.baseDir";
   protected static final String COMPUTER_CHOOSER = "drools.computers.drl.url";
@@ -32,4 +32,5 @@ public abstract class KieServiceExample extends ServiceCase {
     }
     return m;
   }
+
 }

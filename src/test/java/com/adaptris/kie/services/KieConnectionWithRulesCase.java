@@ -1,13 +1,16 @@
 package com.adaptris.kie.services;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.fail;
+
 import java.io.InputStream;
 import java.util.Arrays;
-import org.junit.Test;
+
+import org.junit.jupiter.api.Test;
 import org.kie.api.KieBase;
 import org.kie.api.runtime.KieSession;
 import org.w3c.dom.Document;
+
 import com.adaptris.core.AdaptrisMessage;
 import com.adaptris.core.CoreException;
 import com.adaptris.core.DefaultMarshaller;
@@ -21,22 +24,13 @@ import com.adaptris.kie.test.model.Person;
 import com.adaptris.util.text.xml.XPath;
 
 public abstract class KieConnectionWithRulesCase extends KieServiceExample {
-  @Override
-  public boolean isAnnotatedForJunit4() {
-    return true;
-  }
+
   @Test
   public void testUncheckedLifecycle() throws Exception {
     KieServiceImpl.uncheckedLifecycle(Arrays.asList(new ComponentLifetimeSession()), e -> {
       LifecycleHelper.initAndStart(e);
     });
-    SessionManagement working = new SessionManagement() {
-
-      @Override
-      public KieSession get(KieBase kieBase, AdaptrisMessage msg) throws Exception {
-        return null;
-      }
-    };
+    SessionManagement working = (kieBase, msg) -> null;
     SessionManagement failing = new SessionManagement() {
 
       @Override
@@ -64,9 +58,8 @@ public abstract class KieConnectionWithRulesCase extends KieServiceExample {
 
   @Test
   public void testLifecycle() throws Exception {
-    KieServiceImpl service = addConnection(createForTests());
+    KieServiceImpl<?> service = addConnection(createForTests());
     try {
-      
       LifecycleHelper.prepare(service);
       fail();
     } catch (CoreException expected) {
@@ -78,9 +71,8 @@ public abstract class KieConnectionWithRulesCase extends KieServiceExample {
 
   @Test
   public void testService_WithQuery() throws Exception {
-    KieServiceImpl service = addConnection(createForTests())
-        .withExecutionContext(new SimpleExecutionContext().withQueryName("getComputerRecommendation")
-            .withInsertId("payload").withQueryResultId("computer").withQueryResultRowId("$c"));
+    KieServiceImpl<?> service = addConnection(createForTests()).withExecutionContext(new SimpleExecutionContext()
+        .withQueryName("getComputerRecommendation").withInsertId("payload").withQueryResultId("computer").withQueryResultRowId("$c"));
     try {
       LifecycleHelper.initAndStart(service);
       AdaptrisMessage msg = createMessage(playGod("manager", "travelling"));
@@ -105,8 +97,7 @@ public abstract class KieConnectionWithRulesCase extends KieServiceExample {
 
   @Test
   public void testService_WithoutQuery() throws Exception {
-    KieServiceImpl service = addConnection(createForTests())
-        .withExecutionContext(new SimpleExecutionContext().withInsertId("payload"));
+    KieServiceImpl<?> service = addConnection(createForTests()).withExecutionContext(new SimpleExecutionContext().withInsertId("payload"));
     try {
       LifecycleHelper.initAndStart(service);
 
@@ -131,8 +122,7 @@ public abstract class KieConnectionWithRulesCase extends KieServiceExample {
 
   @Test
   public void testRule_CompileFails() throws Exception {
-    KieServiceImpl service = createForTests()
-        .withConnection(new KieConnectionWithRules().withRules(PROPERTIES.getProperty(BROKEN_DRL)))
+    KieServiceImpl<?> service = createForTests().withConnection(new KieConnectionWithRules().withRules(PROPERTIES.getProperty(BROKEN_DRL)))
         .withExecutionContext(new SimpleExecutionContext().withInsertId("payload"));
     try {
       LifecycleHelper.initAndStart(service);
@@ -146,20 +136,18 @@ public abstract class KieConnectionWithRulesCase extends KieServiceExample {
     }
   }
 
-  protected KieServiceImpl addConnection(KieServiceImpl s) {
+  protected KieServiceImpl<?> addConnection(KieServiceImpl<?> s) {
     return s.withConnection(
-        new KieConnectionWithRules().withRules(PROPERTIES.getProperty(COMPUTER_CHOOSER),
-            PROPERTIES.getProperty(GENERATION_CHOOSER)));
+        new KieConnectionWithRules().withRules(PROPERTIES.getProperty(COMPUTER_CHOOSER), PROPERTIES.getProperty(GENERATION_CHOOSER)));
   }
 
-  protected abstract KieServiceImpl createForTests();
+  protected abstract KieServiceImpl<?> createForTests();
 
   @Override
-  protected KieServiceImpl retrieveObjectForSampleConfig() {
-    KieServiceImpl service = createForTests();
+  protected KieServiceImpl<?> retrieveObjectForSampleConfig() {
+    KieServiceImpl<?> service = createForTests();
     service.setExecutionContext(new SimpleExecutionContext().withInsertId("payload"));
-    service.setConnection(
-        new KieConnectionWithRules().withRules("file:////path/to/first/rule.drl", "file:////path/to/another/rule.drl"));
+    service.setConnection(new KieConnectionWithRules().withRules("file:////path/to/first/rule.drl", "file:////path/to/another/rule.drl"));
     return service;
   }
 
@@ -170,4 +158,5 @@ public abstract class KieConnectionWithRulesCase extends KieServiceExample {
   protected Person playGod(int birthYear) {
     return new Person().withYearOfBirth(birthYear);
   }
+
 }

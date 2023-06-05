@@ -15,19 +15,14 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 /**
  * Stateless JBoss Rules Engine execution.
- * 
+ *
  * @config kie-stateless-service
  */
 @XStreamAlias("kie-stateless-service")
 @AdapterComponent
-@ComponentProfile(summary = "Stateless KIE/Drools Engine execution", tag = "service,drools,kie", since = "3.8.2", recommended =
-{
-    KieConnection.class
-})
-@DisplayOrder(order =
-{
-    "connection", "executionContext"
-})
+@ComponentProfile(summary = "Stateless KIE/Drools Engine execution", tag = "service,drools,kie", since = "3.8.2", recommended = {
+    KieConnection.class })
+@DisplayOrder(order = { "connection", "executionContext" })
 public class KieStatelessService extends KieServiceImpl<StatelessKieSession> {
 
   public KieStatelessService() {
@@ -35,7 +30,7 @@ public class KieStatelessService extends KieServiceImpl<StatelessKieSession> {
 
   @Override
   protected Collection<ComponentLifecycle> wrappedLifecycleObjects() {
-    return Collections.EMPTY_LIST;
+    return Collections.emptyList();
   }
 
   @Override

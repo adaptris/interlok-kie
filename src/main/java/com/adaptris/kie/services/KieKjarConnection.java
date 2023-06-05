@@ -2,8 +2,9 @@ package com.adaptris.kie.services;
 
 import java.util.concurrent.TimeUnit;
 
+import javax.validation.constraints.NotBlank;
+
 import org.apache.commons.lang3.BooleanUtils;
-import org.hibernate.validator.constraints.NotBlank;
 import org.kie.api.KieBase;
 import org.kie.api.builder.KieScanner;
 import org.kie.api.builder.ReleaseId;
@@ -20,13 +21,13 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 /**
  * Connection that builds up a KieContainer based on {@code KieServices#newReleaseId(String, String, String)}.
- * 
+ *
  * <p>
- * If you have a custom repository then you may need to override maven behaviour with a custom settings.xml using the system
- * property {@code kie.maven.settings.custom}. If you want to use a {@code KieScanner} then you will need to have the {@code kie-ci}
- * artifact as well.
+ * If you have a custom repository then you may need to override maven behaviour with a custom settings.xml using the system property
+ * {@code kie.maven.settings.custom}. If you want to use a {@code KieScanner} then you will need to have the {@code kie-ci} artifact as
+ * well.
  * </p>
- * 
+ *
  * @config kie-kjar-connection
  */
 @XStreamAlias("kie-kjar-connection")
@@ -62,12 +63,12 @@ public class KieKjarConnection extends KieConnection {
       Args.notNull(getArtifactId(), "artifact");
       Args.notNull(getVersion(), "version");
       Args.notNull(getKieBaseName(), "kieBaseName");
-    }
-    catch (Exception e) {
+    } catch (Exception e) {
       throw ExceptionHelper.wrapCoreException(e);
     }
   }
 
+  @Override
   protected KieBase buildKieBase() throws Exception {
     ReleaseId releaseId = services.newReleaseId(getGroupId(), getArtifactId(), getVersion());
     KieContainer container = services.newKieContainer(releaseId);
@@ -115,17 +116,17 @@ public class KieKjarConnection extends KieConnection {
 
   /**
    * Whether or not to create a {@code KieScanner} to monitor your maven repository for updated Kie projects.
-   * 
+   *
    * <p>
-   * Note that even though you enable a {@code KieScanner} there's no guarantee that it will work; {@code KieScanner} will only
-   * pickup changes to deployed jars if it is using a SNAPSHOT, version range, the LATEST, or the RELEASE setting. Fixed versions
-   * will not automatically update at runtime.
+   * Note that even though you enable a {@code KieScanner} there's no guarantee that it will work; {@code KieScanner} will only pickup
+   * changes to deployed jars if it is using a SNAPSHOT, version range, the LATEST, or the RELEASE setting. Fixed versions will not
+   * automatically update at runtime.
    * </p>
-   * 
+   *
    * @param b
    */
   public void setRescan(Boolean b) {
-    this.rescan = b;
+    rescan = b;
   }
 
   protected boolean rescan() {
@@ -138,11 +139,11 @@ public class KieKjarConnection extends KieConnection {
 
   /**
    * Set the rescan interval if {@link #setRescan(Boolean)} is true.
-   * 
+   *
    * @param i
    */
   public void setRescanInterval(TimeInterval i) {
-    this.rescanInterval = i;
+    rescanInterval = i;
   }
 
   protected long rescanIntervalMillis() {
@@ -169,15 +170,16 @@ public class KieKjarConnection extends KieConnection {
 
   /**
    * Specify the name of the {@code KieBase} within the {@code KieContainer} that you wish to use.
-   * 
+   *
    * @param s
    */
   public void setKieBaseName(String s) {
-    this.kieBaseName = s;
+    kieBaseName = s;
   }
 
   public KieKjarConnection withKieBaseName(String s) {
     setKieBaseName(s);
     return this;
   }
+
 }

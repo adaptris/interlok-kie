@@ -8,4 +8,5 @@ public class Laptop extends Computer {
   public Laptop() {
     setRam(8192);
   }
+
 }

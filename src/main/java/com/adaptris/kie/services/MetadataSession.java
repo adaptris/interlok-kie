@@ -1,6 +1,7 @@
 package com.adaptris.kie.services;
 
-import org.hibernate.validator.constraints.NotBlank;
+import javax.validation.constraints.NotBlank;
+
 import org.kie.api.KieBase;
 import org.kie.api.runtime.KieSession;
 
@@ -16,20 +17,18 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
  * The {@code KieSession} is created upon the first invocation of {@link #get(KieBase, AdaptrisMessage)} and is disposed when the
  * AdaptrisMessage contains the metadata key specified by {@link #getMetadataKey()} (the value doesn't matter).
  * </p>
- * 
+ *
  * @config kie-metadata-controlled-session
- * 
+ *
  */
 @XStreamAlias("kie-metadata-controlled-session")
 public class MetadataSession extends SessionManagementImpl {
 
   /**
    * The default metadata key; value is {@value #DEFAULT_METADATA_KEY}.
-   * 
+   *
    */
   public static final String DEFAULT_METADATA_KEY = "kie.session.dispose";
-
-  private transient KieSession session = null;
 
   @NotBlank(message = "metadataKey may not be null")
   @AutoPopulated
@@ -49,12 +48,9 @@ public class MetadataSession extends SessionManagementImpl {
   public synchronized KieSession get(KieBase b, AdaptrisMessage msg) {
     if (session == null) {
       session = b.newKieSession();
-    }
-    else {
-      if (msg.headersContainsKey(getMetadataKey())) {
-        SessionManagement.disposeQuietly(session);
-        session = b.newKieSession();
-      }
+    } else if (msg.headersContainsKey(getMetadataKey())) {
+      SessionManagement.disposeQuietly(session);
+      session = b.newKieSession();
     }
     return session;
   }
@@ -69,9 +65,11 @@ public class MetadataSession extends SessionManagementImpl {
   /**
    * Set the metadata key which will force disposal of the session.
    *
-   * @param s the metadataKey to set, if not explicitly specified defaults to {@value #DEFAULT_METADATA_KEY}
+   * @param s
+   *          the metadataKey to set, if not explicitly specified defaults to {@value #DEFAULT_METADATA_KEY}
    */
   public void setMetadataKey(String s) {
     metadataKey = Args.notBlank(s, "metadataKey");
   }
+
 }

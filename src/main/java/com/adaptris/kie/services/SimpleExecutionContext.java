@@ -6,16 +6,14 @@ import java.util.List;
 import java.util.stream.StreamSupport;
 
 import javax.validation.Valid;
+import javax.validation.constraints.NotBlank;
 
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.hibernate.validator.constraints.NotBlank;
 import org.kie.api.command.Command;
 import org.kie.api.runtime.ExecutionResults;
 import org.kie.api.runtime.rule.QueryResults;
 import org.kie.internal.command.CommandFactory;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.adaptris.annotation.InputFieldHint;
 import com.adaptris.core.AdaptrisMarshaller;
@@ -26,7 +24,7 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 /**
  * ExecutionContext using a configured {@link AdaptrisMarshaller}.
- * 
+ *
  * <p>
  * When building the command array it does this :
  * <ul>
@@ -34,21 +32,21 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
  * <li>Build a {@code InsertObjectCommand} using that object with the specified {@code insertId}</li>
  * <li>Build a {@code FireAllRulesCommand}</li>
  * <li>Build a {@code QueryCommand} using the specified {@code queryName}; you will also need to specify
- * {@code queryResultId, queryResultRowId} in order to traverse the {@code QueryResult} object; if these are not configured, no
- * QueryCommand is generated.</li>
+ * {@code queryResultId, queryResultRowId} in order to traverse the {@code QueryResult} object; if these are not configured, no QueryCommand
+ * is generated.</li>
  * </ul>
  * </p>
- * 
+ *
  * When evalutating the results of the execution it does :
  * <ul>
- * <li>Get the QueryResults object stored against {@code queryResultId}. If no query was ever generated, then {@code insertId} is
- * used, assuming that what was inserted will have been modified</li>
+ * <li>Get the QueryResults object stored against {@code queryResultId}. If no query was ever generated, then {@code insertId} is used,
+ * assuming that what was inserted will have been modified</li>
  * <li>Use the configured marshaller to turn the result into its String representation</li>
  * <li>Use that as the payload</li>
  * </ul>
- * 
+ *
  * @config kie-simple-execution-context
- * 
+ *
  */
 @XStreamAlias("kie-simple-execution-context")
 public class SimpleExecutionContext implements ExecutionContext {
@@ -65,11 +63,9 @@ public class SimpleExecutionContext implements ExecutionContext {
   @Valid
   private AdaptrisMarshaller marshaller;
 
-  private transient Logger log = LoggerFactory.getLogger(SimpleExecutionContext.class);
-
   @Override
   public List<Command<?>> buildCommands(AdaptrisMessage msg) throws Exception {
-    List<Command<?>> commands = new ArrayList<Command<?>>();
+    List<Command<?>> commands = new ArrayList<>();
     try (InputStream in = msg.getInputStream()) {
       commands.add(CommandFactory.newInsert(marshaller().unmarshal(in), msg.resolve(getInsertId())));
     }
@@ -173,4 +169,5 @@ public class SimpleExecutionContext implements ExecutionContext {
     setQueryName(s);
     return this;
   }
+  
 }

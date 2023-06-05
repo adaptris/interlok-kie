@@ -27,7 +27,7 @@ import com.thoughtworks.xstream.annotations.XStreamImplicit;
 
 /**
  * Connection that builds up the {@code KieContainer} programatically rather than using a {@code kjar+releaseId}.
- * 
+ *
  * @config kie-connection-with-rules
  */
 @XStreamAlias("kie-connection-with-rules")
@@ -58,6 +58,7 @@ public class KieConnectionWithRules extends KieConnection {
   // return base;
   // }
 
+  @Override
   protected KieBase buildKieBase() throws Exception {
     KieFileSystem fs = services.newKieFileSystem();
     for (String rule : getRules()) {
@@ -86,7 +87,8 @@ public class KieConnectionWithRules extends KieConnection {
   }
 
   public KieConnection withRules(String... rules) {
-    setRules(new ArrayList(Arrays.asList(rules)));
+    setRules(new ArrayList<>(Arrays.asList(rules)));
     return this;
   }
+
 }

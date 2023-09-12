@@ -8,7 +8,7 @@
   <version>0.0.1-SNAPSHOT</version>
   <url>https://interlok.adaptris.net/interlok-docs/#/</url>
   <properties>
-    <drools.version>7.60.0.Final</drools.version>
+    <drools.version>7.69.0.Final</drools.version>
     <adaptris.remote.repo.url>https://nexus.adaptris.net/nexus/content/repositories/snapshots</adaptris.remote.repo.url>
     <isRelease>false</isRelease>
   </properties>

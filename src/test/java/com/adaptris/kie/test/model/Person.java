@@ -14,11 +14,11 @@ public class Person {
 
   public enum Gender {
     MALE, FEMALE;
+
     public static Gender fromOrdinal(int n) {
       return values()[n];
     }
-
-  };
+  }
 
   // American definitions from
   // http://www.pewresearch.org/fact-tank/2018/04/11/millennials-largest-generation-us-labor-force/ft_15-05-11_millennialsdefined/
@@ -28,7 +28,7 @@ public class Person {
     GenerationX, // 1965-1980
     Millenial, // 1981-1997
     GenerationZ, // 1998 onwards
-  };
+  }
 
   private String name;
   private int yearOfBirth;
@@ -68,7 +68,7 @@ public class Person {
   }
 
   public void setHobbies(List<String> s) {
-    this.hobbies = s;
+    hobbies = s;
   }
 
   public String getName() {
@@ -84,7 +84,7 @@ public class Person {
   }
 
   public void setProfession(String s) {
-    this.profession = s;
+    profession = s;
   }
 
   public Person withProfession(String profession) {
@@ -110,7 +110,7 @@ public class Person {
   }
 
   public void setGeneration(Generation g) {
-    this.generation = g;
+    generation = g;
   }
-}
 
+}

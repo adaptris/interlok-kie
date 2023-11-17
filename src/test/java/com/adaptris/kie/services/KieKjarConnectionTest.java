@@ -1,20 +1,23 @@
 package com.adaptris.kie.services;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
+
 import java.io.InputStream;
 import java.util.concurrent.TimeUnit;
-import org.junit.Test;
+
+import org.junit.jupiter.api.Test;
+
 import com.adaptris.core.AdaptrisMessage;
-import com.adaptris.core.BaseCase;
 import com.adaptris.core.CoreException;
 import com.adaptris.core.DefaultMarshaller;
-import com.adaptris.core.ServiceCase;
 import com.adaptris.core.util.LifecycleHelper;
 import com.adaptris.holiday.model.Holiday;
+import com.adaptris.interlok.junit.scaffolding.BaseCase;
+import com.adaptris.interlok.junit.scaffolding.services.ExampleServiceCase;
 import com.adaptris.util.TimeInterval;
 
 public class KieKjarConnectionTest extends BaseCase {
@@ -22,20 +25,17 @@ public class KieKjarConnectionTest extends BaseCase {
   protected static final String ARTIFACT_ID = "drools.kjar.artifactId";
   protected static final String VERSION = "drools.kjar.version";
   protected static final String KIE_BASE = "drools.kjar.kiebase";
-  @Override
-  public boolean isAnnotatedForJunit4() {
-    return true;
-  }
+
   @Test
   public void testService_RescanEnabled() throws Exception {
-    KieServiceImpl service = new KieService()
+    KieServiceImpl<?> service = new KieService()
         .withConnection(new KieKjarConnection()
             .withReleaseId(PROPERTIES.getProperty(GROUP_ID), PROPERTIES.getProperty(ARTIFACT_ID), PROPERTIES.getProperty(VERSION))
             .withKieBaseName(PROPERTIES.getProperty(KIE_BASE)).withRescan(true, new TimeInterval(1L, TimeUnit.HOURS)))
         .withExecutionContext(new SimpleExecutionContext().withInsertId("payload"));
     try {
       AdaptrisMessage msg = KieServiceExample.createMessage(new Holiday().withDestination("cornwall"));
-      ServiceCase.execute(service, msg);
+      ExampleServiceCase.execute(service, msg);
       try (InputStream in = msg.getInputStream()) {
         Holiday holiday = (Holiday) DefaultMarshaller.getDefaultMarshaller().unmarshal(in);
         assertEquals(Holiday.TransportType.Automobile, holiday.getTransportType());
@@ -48,14 +48,12 @@ public class KieKjarConnectionTest extends BaseCase {
 
   @Test
   public void testService_RescanDisabled() throws Exception {
-    KieServiceImpl service = new KieService()
-        .withConnection(new KieKjarConnection()
-            .withReleaseId(PROPERTIES.getProperty(GROUP_ID), PROPERTIES.getProperty(ARTIFACT_ID), PROPERTIES.getProperty(VERSION))
-            .withKieBaseName(PROPERTIES.getProperty(KIE_BASE)))
-        .withExecutionContext(new SimpleExecutionContext().withInsertId("payload"));
+    KieServiceImpl<?> service = new KieService().withConnection(new KieKjarConnection()
+        .withReleaseId(PROPERTIES.getProperty(GROUP_ID), PROPERTIES.getProperty(ARTIFACT_ID), PROPERTIES.getProperty(VERSION))
+        .withKieBaseName(PROPERTIES.getProperty(KIE_BASE))).withExecutionContext(new SimpleExecutionContext().withInsertId("payload"));
     try {
       AdaptrisMessage msg = KieServiceExample.createMessage(new Holiday().withDestination("sydney"));
-      ServiceCase.execute(service, msg);
+      ExampleServiceCase.execute(service, msg);
       try (InputStream in = msg.getInputStream()) {
         Holiday holiday = (Holiday) DefaultMarshaller.getDefaultMarshaller().unmarshal(in);
         assertEquals(Holiday.TransportType.Plane, holiday.getTransportType());

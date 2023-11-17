@@ -1,14 +1,12 @@
 package com.adaptris.kie.services;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.Mockito.when;
 
 import java.util.concurrent.TimeUnit;
 
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TestName;
+import org.junit.jupiter.api.Test;
 import org.kie.api.KieBase;
 import org.kie.api.runtime.KieSession;
 import org.mockito.Mockito;
@@ -19,9 +17,6 @@ import com.adaptris.core.util.LifecycleHelper;
 import com.adaptris.util.TimeInterval;
 
 public class TimedSessionTest {
-
-  @Rule
-  public TestName testName = new TestName();
 
   @Test
   public void testSessionLifetime() throws Exception {

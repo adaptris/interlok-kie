@@ -2,18 +2,19 @@ import org.apache.tools.ant.taskdefs.condition.Os
 import org.apache.tools.ant.filters.*
 
 plugins {
-  id 'java-library'
-  id 'maven-publish'
-  id 'jacoco'
+  id "java-library"
+  id "maven-publish"
+  id "jacoco"
   // Manage optional dependencies in maven pom.
-  id 'nebula.optional-base' version '7.0.0'
-  id 'com.github.spotbugs' version '5.0.14'
-  id 'org.owasp.dependencycheck' version '8.2.1'
+  id "nebula.optional-base" version "7.0.0"
+  id "com.github.spotbugs" version "5.2.1"
+  id "org.sonarqube" version "4.4.1.3373"
+  id "org.owasp.dependencycheck" version "8.4.2"
 }
 
 ext {
-  interlokCoreVersion = project.hasProperty('interlokCoreVersion') ? project.getProperty('interlokCoreVersion') : '4.8-SNAPSHOT'
-  releaseVersion = project.hasProperty('releaseVersion') ? project.getProperty('releaseVersion') : '4.8-SNAPSHOT'
+  interlokCoreVersion = project.hasProperty('interlokCoreVersion') ? project.getProperty('interlokCoreVersion') : '5.0-SNAPSHOT'
+  releaseVersion = project.hasProperty('releaseVersion') ? project.getProperty('releaseVersion') : '5.0-SNAPSHOT'
   nexusBaseUrl = project.hasProperty('nexusBaseUrl') ? project.getProperty('nexusBaseUrl') : 'https://nexus.adaptris.net/nexus'
   mavenPublishUrl = project.hasProperty('mavenPublishUrl') ? project.getProperty('mavenPublishUrl') : nexusBaseUrl + '/content/repositories/snapshots'
   javadocsBaseUrl = nexusBaseUrl + "/content/sites/javadocs/com/adaptris"
@@ -28,8 +29,8 @@ ext {
   componentDesc='Using KIE/Drools with Interlok services'
   organizationName = "Adaptris Ltd"
   organizationUrl = "http://interlok.adaptris.net"
-  slf4jVersion = '2.0.3'
-  mockitoVersion = '4.9.0'
+  slf4jVersion = '2.0.9'
+  mockitoVersion = '5.2.0'
   droolsVersion = '7.73.0.Final'
 }
 
@@ -70,11 +71,19 @@ ext.buildInfo = { ->
     }
 }
 
-sourceCompatibility = JavaVersion.VERSION_11
-targetCompatibility = JavaVersion.VERSION_11
+sourceCompatibility = JavaVersion.VERSION_17
+targetCompatibility = JavaVersion.VERSION_17
 group   = 'com.adaptris'
 version = releaseVersion
 def versionDir = "$buildDir/version"
+
+sonar {
+  properties {
+    property "sonar.projectKey", "adaptris_interlok-kie"
+    property "sonar.organization", "adaptris-org"
+    property "sonar.host.url", "https://sonarcloud.io"
+  }
+}
 
 // Disable gradle module generation since we probably don't want
 // xxx.module files in your repository.
@@ -137,7 +146,7 @@ dependencies {
   implementation ("org.apache.commons:commons-collections4:4.4")
   implementation ("org.drools:drools-core:$droolsVersion") {  }
   implementation ("org.drools:drools-compiler:$droolsVersion") {  }
-  implementation ("commons-codec:commons-codec:1.15")
+  implementation ("commons-codec:commons-codec:1.16.0")
 
   implementation ("org.slf4j:slf4j-api:$slf4jVersion")
 
@@ -145,7 +154,7 @@ dependencies {
 
   testAnnotationProcessor ("com.adaptris:interlok-core-apt:$interlokCoreVersion") {changing= true}
 
-  testImplementation ('junit:junit:4.13.2')
+  testImplementation ("org.junit.jupiter:junit-jupiter-engine:5.10.0")
   testImplementation ("org.slf4j:slf4j-simple:$slf4jVersion")
   testImplementation ("com.adaptris:interlok-stubs:$interlokCoreVersion") { changing= true }
   testImplementation ("org.mockito:mockito-core:$mockitoVersion")
@@ -158,7 +167,7 @@ dependencies {
     exclude group: 'org.codehaus.plexus', module: 'plexus-utils'
   }
   testImplementation ("org.apache.httpcomponents:httpclient:4.5.14")
-  testImplementation ("com.google.guava:guava:31.1-jre")
+  testImplementation ("com.google.guava:guava:32.1.3-jre")
   testImplementation ("org.codehaus.plexus:plexus-utils:3.5.1")
 
   // this is purely for testing kjar connections, simple kmodule based kjar.
@@ -168,7 +177,6 @@ dependencies {
   javadoc("com.adaptris:interlok-core-apt:$interlokCoreVersion") { changing= true}
   offlineJavadocPackages ("com.adaptris:interlok-core:$interlokCoreVersion:javadoc@jar") { changing= true}
   offlineJavadocPackages ("com.adaptris:interlok-common:$interlokCoreVersion:javadoc@jar") { changing= true}
-
 }
 
 task buildUnitTestProperties(type: Copy) {
@@ -218,7 +226,6 @@ task generateVersion {
   }
 }
 
-
 task offlinePackageList(type: Copy) {
   description 'Build an offline package-list for javadocs'
   group 'Documentation'
@@ -232,7 +239,6 @@ task offlinePackageList(type: Copy) {
   include "element-list"
   into offlineJavadocPackageDir
 }
-
 
 jar {
   manifest {
@@ -251,32 +257,31 @@ javadoc {
     options.linksOffline(interlokCommonJavadocs, offlineJavadocPackageDir.getCanonicalPath() + "/interlok-common-$interlokCoreVersion-javadoc.jar")
     taglets = ["com.adaptris.taglet.ConfigTaglet", "com.adaptris.taglet.LicenseTaglet"]
     options.addStringOption "tagletpath", configurations.javadoc.asPath
-    options.addStringOption('Xdoclint:none', '-quiet')
-    options.addBooleanOption "-no-module-directories", true
+    options.addStringOption "Xdoclint:none", "-quiet"
     options.tags('apiNote:a:API Note:', 'implSpec:a:Implementation Requirements:','implNote:a:Implementation Note:')
     title= componentName
   }
 }
 
 task javadocJar(type: Jar, dependsOn: javadoc) {
-    classifier = 'javadoc'
-    from javadoc.destinationDir
+  classifier = 'javadoc'
+  from javadoc.destinationDir
 }
 
 task examplesJar(type: Jar, dependsOn: test) {
-    classifier = 'examples'
-    from new File(buildDir, '/examples')
+  classifier = 'examples'
+  from new File(buildDir, '/examples')
 }
 
 task sourcesJar(type: Jar, dependsOn: classes) {
-    classifier = 'sources'
-    from sourceSets.main.allSource
+  classifier = 'sources'
+  from sourceSets.main.allSource
 }
 
 artifacts {
-    archives javadocJar
-    archives examplesJar
-    archives sourcesJar
+  archives javadocJar
+  archives examplesJar
+  archives sourcesJar
 }
 
 publishing {
@@ -290,7 +295,7 @@ publishing {
       pom.withXml {
         asNode().appendNode("name", componentName)
         asNode().appendNode("description", componentDesc)
-		asNode().appendNode("url", "https://interlok.adaptris.net/interlok-docs/#/")
+        asNode().appendNode("url", "https://interlok.adaptris.net/interlok-docs/#/")
         def properties = asNode().appendNode("properties")
         properties.appendNode("target", "3.8.2+")
         properties.appendNode("license", "false")
@@ -325,9 +330,6 @@ spotbugsMain {
   }
 }
 
-// disable spotbugsTests which checks our test code..
-spotbugsTest.enabled = false
-
 dependencyCheck  {
   suppressionFiles= [ "https://raw.githubusercontent.com/adaptris/interlok/develop/gradle/owasp-exclude.xml" ]
   scanConfigurations = [ "api", "compileClasspath", "runtimeClasspath" ]
@@ -339,6 +341,13 @@ dependencyCheck  {
     knownExploitedURL=project.findProperty('dependencyCheckKnownExploitedURL')
   }
 }
+
+test {
+  useJUnitPlatform()
+}
+
+// disable spotbugsTests which checks our test code..
+spotbugsTest.enabled = false
 
 check.dependsOn jacocoTestReport
 processTestResources.dependsOn buildUnitTestProperties

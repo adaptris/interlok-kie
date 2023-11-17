@@ -8,4 +8,5 @@ public class Desktop extends Computer {
   public Desktop() {
     setRam(65536);
   }
+
 }

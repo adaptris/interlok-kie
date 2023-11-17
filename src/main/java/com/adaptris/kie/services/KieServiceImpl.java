@@ -27,7 +27,7 @@ import com.adaptris.core.util.ExceptionHelper;
 import com.adaptris.core.util.LifecycleHelper;
 
 /**
- * 
+ *
  * Abstract base class for KIE services.
  *
  */
@@ -65,6 +65,7 @@ public abstract class KieServiceImpl<S extends CommandExecutor> extends ServiceI
 
   }
 
+  @Override
   public void start() throws CoreException {
     uncheckedLifecycle(lifecycleObjects(), e -> {
       LifecycleHelper.start(e);
@@ -72,13 +73,14 @@ public abstract class KieServiceImpl<S extends CommandExecutor> extends ServiceI
 
   }
 
+  @Override
   public void stop() {
     uncheckedLifecycle(lifecycleObjects(), e -> {
       LifecycleHelper.stop(e);
     });
   }
 
-
+  @Override
   protected void closeService() {
     uncheckedLifecycle(lifecycleObjects(), e -> {
       LifecycleHelper.close(e);
@@ -86,13 +88,14 @@ public abstract class KieServiceImpl<S extends CommandExecutor> extends ServiceI
   }
 
   // Wrapper so that we include the connection & resolver in the list of lifecycle objects.
+  @SuppressWarnings({ "rawtypes", "unchecked" })
   private Collection<ComponentLifecycle> lifecycleObjects() {
-    return new CompositeCollection(Arrays.asList(connection, executionContext), wrappedLifecycleObjects());
+    return new CompositeCollection(Arrays.<ComponentLifecycle> asList(connection, executionContext), wrappedLifecycleObjects());
   }
-  
+
   /**
    * Return all the objects that need lifecycle applying to them.
-   * 
+   *
    * @return all the objects that need lifecycle or an empty array.
    */
   protected abstract Collection<ComponentLifecycle> wrappedLifecycleObjects();
@@ -121,20 +124,24 @@ public abstract class KieServiceImpl<S extends CommandExecutor> extends ServiceI
     executionContext = Args.notNull(f, "executionContext");
   }
 
-  public <T extends KieServiceImpl> T withExecutionContext(ExecutionContext c) {
+  @SuppressWarnings("unchecked")
+  public <T extends KieServiceImpl<?>> T withExecutionContext(ExecutionContext c) {
     setExecutionContext(c);
     return (T) this;
   }
 
+  @Override
   public AdaptrisConnection getConnection() {
     return connection;
   }
 
+  @Override
   public void setConnection(AdaptrisConnection connection) {
     this.connection = Args.notNull(connection, "connection");
   }
 
-  public <T extends KieServiceImpl> T withConnection(AdaptrisConnection c) {
+  @SuppressWarnings("unchecked")
+  public <T extends KieServiceImpl<?>> T withConnection(AdaptrisConnection c) {
     setConnection(c);
     return (T) this;
   }
@@ -155,7 +162,7 @@ public abstract class KieServiceImpl<S extends CommandExecutor> extends ServiceI
 
   /**
    * Functional interface for wrapping lifecycle operations.
-   * 
+   *
    */
   @FunctionalInterface
   protected static interface WrappedLifecycle {
@@ -170,4 +177,5 @@ public abstract class KieServiceImpl<S extends CommandExecutor> extends ServiceI
       super(cause);
     }
   }
+
 }

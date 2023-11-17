@@ -1,11 +1,9 @@
 package com.adaptris.kie.services;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
 
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TestName;
+import org.junit.jupiter.api.Test;
 import org.kie.api.KieBase;
 import org.kie.api.runtime.KieSession;
 import org.mockito.Mockito;
@@ -15,9 +13,6 @@ import com.adaptris.core.AdaptrisMessageFactory;
 import com.adaptris.core.util.LifecycleHelper;
 
 public class MetadataSessionTest {
-
-  @Rule
-  public TestName testName = new TestName();
 
   @Test
   public void testGetKieBase() throws Exception {
@@ -32,8 +27,8 @@ public class MetadataSessionTest {
       assertEquals(session1, strat.get(mockKieBase, msg));
       assertEquals(session1, strat.get(mockKieBase, msg));
       AdaptrisMessage msg2 = AdaptrisMessageFactory.getDefaultInstance().newMessage();
-      msg.addMetadata("newSessionRequired", "blah blah");
-      assertEquals(session2, strat.get(mockKieBase, msg));
+      msg2.addMetadata("newSessionRequired", "blah blah");
+      assertEquals(session2, strat.get(mockKieBase, msg2));
     } finally {
       LifecycleHelper.stopAndClose(strat);
     }

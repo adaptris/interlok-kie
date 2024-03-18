@@ -158,7 +158,7 @@ dependencies {
     exclude group: 'org.codehaus.plexus', module: 'plexus-utils'
   }
   testImplementation ("org.apache.httpcomponents:httpclient:4.5.14")
-  testImplementation ("com.google.guava:guava:33.0.0-jre")
+  testImplementation ("com.google.guava:guava:33.1.0-jre")
   testImplementation ("org.codehaus.plexus:plexus-utils:3.5.1")
 
   // this is purely for testing kjar connections, simple kmodule based kjar.

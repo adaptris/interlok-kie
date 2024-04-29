@@ -146,7 +146,7 @@ dependencies {
   implementation ("org.apache.commons:commons-collections4:4.4")
   implementation ("org.drools:drools-core:$droolsVersion") {  }
   implementation ("org.drools:drools-compiler:$droolsVersion") {  }
-  implementation ("commons-codec:commons-codec:1.16.1")
+  implementation ("commons-codec:commons-codec:1.17.0")
 
   implementation ("org.slf4j:slf4j-api:$slf4jVersion")
 

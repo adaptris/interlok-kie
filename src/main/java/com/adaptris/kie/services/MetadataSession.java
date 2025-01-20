@@ -1,6 +1,6 @@
 package com.adaptris.kie.services;
 
-import javax.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotBlank;
 
 import org.kie.api.KieBase;
 import org.kie.api.runtime.KieSession;

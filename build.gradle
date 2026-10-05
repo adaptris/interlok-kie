@@ -134,7 +134,7 @@ dependencies {
   api ("com.adaptris:interlok-core:$interlokCoreVersion") { changing= true}
   api ("com.adaptris:interlok-common:$interlokCoreVersion") { changing= true}
   implementation ("com.thoughtworks.xstream:xstream:1.4.21")
-  implementation ("org.apache.commons:commons-collections4:4.5.0")
+  implementation ("org.apache.commons:commons-collections4:4.6.0")
   implementation ("org.drools:drools-core:$droolsVersion") {  }
   implementation ("org.drools:drools-compiler:$droolsVersion") {  }
   implementation ("commons-codec:commons-codec:1.22.1")

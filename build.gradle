@@ -13,14 +13,16 @@ plugins {
 }
 
 ext {
-  interlokCoreVersion = project.hasProperty('interlokCoreVersion') ? project.getProperty('interlokCoreVersion') : '5.0-SNAPSHOT'
-  releaseVersion = project.hasProperty('releaseVersion') ? project.getProperty('releaseVersion') : '5.0-SNAPSHOT'
+  interlokCatalogVersion = project.findProperty('interlokCatalogVersion') ?: '5.0-SNAPSHOT'
+  interlokCoreVersion = project.findProperty('interlokCoreVersion') ?: interlokCatalogVersion
+  releaseVersion = project.findProperty('releaseVersion') ?: interlokCatalogVersion
   nexusBaseUrl = project.hasProperty('nexusBaseUrl') ? project.getProperty('nexusBaseUrl') : 'https://nexus.adaptris.net/nexus'
   mavenPublishUrl = project.hasProperty('mavenPublishUrl') ? project.getProperty('mavenPublishUrl') : nexusBaseUrl + '/content/repositories/snapshots'
   javadocsBaseUrl = nexusBaseUrl + "/content/sites/javadocs/com/adaptris"
   repoUsername = project.hasProperty('repoUsername') ? project.getProperty('repoUsername') : 'unknown'
   repoPassword = project.hasProperty('repoPassword') ? project.getProperty('repoPassword') : 'unknown'
   defaultNexusRepo = project.hasProperty('defaultNexusRepo') ? project.getProperty('defaultNexusRepo') : 'https://repo1.maven.org/maven2/'
+  interlokCatalogPlatform = "com.adaptris:interlok-version-catalog:${interlokCatalogVersion}"
   offlineJavadocPackageDir = new File(project.buildDir, "offline-javadoc-packages")
 
   interlokJavadocs= project.hasProperty('interlokJavadocs') ? project.getProperty('interlokJavadocs') : javadocsBaseUrl + "/interlok-core/" + interlokCoreVersion
@@ -29,8 +31,6 @@ ext {
   componentDesc='Using KIE/Drools with Interlok services'
   organizationName = "Adaptris Ltd"
   organizationUrl = "http://interlok.adaptris.net"
-  slf4jVersion = '2.0.20'
-  mockitoVersion = '5.2.0'
   droolsVersion = '7.73.0.Final'
 }
 
@@ -140,26 +140,34 @@ configurations.all {
 }
 
 dependencies {
-  api ("com.adaptris:interlok-core:$interlokCoreVersion") { changing= true}
-  api ("com.adaptris:interlok-common:$interlokCoreVersion") { changing= true}
-  implementation ("com.thoughtworks.xstream:xstream:1.4.21")
-  implementation ("org.apache.commons:commons-collections4:4.5.0")
-  implementation ("org.drools:drools-core:$droolsVersion") {  }
-  implementation ("org.drools:drools-compiler:$droolsVersion") {  }
-  implementation ("commons-codec:commons-codec:1.23.0")
+  api platform(interlokCatalogPlatform)
+  implementation platform(interlokCatalogPlatform)
+  compileOnly platform(interlokCatalogPlatform)
+  annotationProcessor platform(interlokCatalogPlatform)
+  testImplementation platform(interlokCatalogPlatform)
+  testCompileOnly platform(interlokCatalogPlatform)
+  testRuntimeOnly platform(interlokCatalogPlatform)
 
-  implementation ("org.slf4j:slf4j-api:$slf4jVersion")
+  api ("com.adaptris:interlok-core") { changing= true}
+  api ("com.adaptris:interlok-common") { changing= true}
+  implementation ("com.thoughtworks.xstream:xstream")
+  implementation ("org.apache.commons:commons-collections4")
+  implementation ("org.drools:drools-core") {  }
+  implementation ("org.drools:drools-compiler") {  }
+  implementation ("commons-codec:commons-codec")
 
-  annotationProcessor ("com.adaptris:interlok-core-apt:$interlokCoreVersion") {changing= true}
+  implementation ("org.slf4j:slf4j-api")
+
+  annotationProcessor ("com.adaptris:interlok-core-apt") {changing= true}
 
   testAnnotationProcessor ("com.adaptris:interlok-core-apt:$interlokCoreVersion") {changing= true}
 
-  testImplementation ("org.junit.jupiter:junit-jupiter-engine:5.13.4")
-  testImplementation ("org.junit.platform:junit-platform-launcher:1.13.3")
-  testImplementation ("org.slf4j:slf4j-simple:$slf4jVersion")
-  testImplementation ("com.adaptris:interlok-stubs:$interlokCoreVersion") { changing= true }
-  testImplementation ("org.mockito:mockito-core:$mockitoVersion")
-  testImplementation ("org.mockito:mockito-inline:$mockitoVersion")
+  testImplementation ("org.junit.jupiter:junit-jupiter-engine")
+  testImplementation ("org.junit.platform:junit-platform-launcher")
+  testImplementation ("org.slf4j:slf4j-simple")
+  testImplementation ("com.adaptris:interlok-stubs") { changing= true }
+  testImplementation ("org.mockito:mockito-core")
+  testImplementation ("org.mockito:mockito-inline")
 
   // Required for KScanner, but is generally optional
   testImplementation ("org.kie:kie-ci:$droolsVersion") {
@@ -167,17 +175,18 @@ dependencies {
     exclude group: 'com.google.guava', module: 'guava'
     exclude group: 'org.codehaus.plexus', module: 'plexus-utils'
   }
-  testImplementation ("org.apache.httpcomponents:httpclient:4.5.14")
-  testImplementation ("com.google.guava:guava:33.8.0-jre")
-  testImplementation ("org.codehaus.plexus:plexus-utils:3.5.1")
+  testImplementation ("org.apache.httpcomponents:httpclient")
+  testImplementation ("com.google.guava:guava")
+  testImplementation ("org.codehaus.plexus:plexus-utils")
 
   // this is purely for testing kjar connections, simple kmodule based kjar.
   // don't expect it to change, published out of kie-rule-demo sub-dir.
-  testImplementation ('com.adaptris:kie-rule-demo:0.0.1-SNAPSHOT') { changing= true}
-
-  javadoc("com.adaptris:interlok-core-apt:$interlokCoreVersion") { changing= true}
-  offlineJavadocPackages ("com.adaptris:interlok-core:$interlokCoreVersion:javadoc@jar") { changing= true}
-  offlineJavadocPackages ("com.adaptris:interlok-common:$interlokCoreVersion:javadoc@jar") { changing= true}
+  testImplementation ('com.adaptris:kie-rule-demo') { changing= true}
+  javadoc platform(interlokCatalogPlatform)
+  javadoc("com.adaptris:interlok-core-apt") { changing= true}
+  offlineJavadocPackages platform(interlokCatalogPlatform)
+  offlineJavadocPackages ("com.adaptris:interlok-core:javadoc@jar") { changing= true}
+  offlineJavadocPackages ("com.adaptris:interlok-common:javadoc@jar") { changing= true}
 }
 
 task buildUnitTestProperties(type: Copy) {
@@ -253,9 +262,17 @@ jar {
 }
 
 javadoc {
+  dependsOn "offlinePackageList"
   configure(options) {
-    options.linksOffline(interlokJavadocs, offlineJavadocPackageDir.getCanonicalPath() + "/interlok-core-$interlokCoreVersion-javadoc.jar")
-    options.linksOffline(interlokCommonJavadocs, offlineJavadocPackageDir.getCanonicalPath() + "/interlok-common-$interlokCoreVersion-javadoc.jar")
+    def coreJavadocDir = new File(offlineJavadocPackageDir, "interlok-core-${interlokCoreVersion}-javadoc.jar")
+    def commonJavadocDir = new File(offlineJavadocPackageDir, "interlok-common-${interlokCoreVersion}-javadoc.jar")
+
+    if (new File(coreJavadocDir, 'element-list').exists()) {
+        options.linksOffline(interlokJavadocs, coreJavadocDir.getCanonicalPath())
+    }
+    if (new File(commonJavadocDir, 'element-list').exists()) {
+        options.linksOffline(interlokCommonJavadocs, commonJavadocDir.getCanonicalPath())
+    }
     taglets = ["com.adaptris.taglet.ConfigTaglet", "com.adaptris.taglet.LicenseTaglet"]
     options.addStringOption "tagletpath", configurations.javadoc.asPath
     options.addStringOption "Xdoclint:none", "-quiet"

@@ -147,6 +147,7 @@ dependencies {
   testImplementation platform(interlokCatalogPlatform)
   testCompileOnly platform(interlokCatalogPlatform)
   testRuntimeOnly platform(interlokCatalogPlatform)
+  testAnnotationProcessor platform(interlokCatalogPlatform)
 
   api ("com.adaptris:interlok-core") { changing= true}
   api ("com.adaptris:interlok-common") { changing= true}
@@ -160,7 +161,7 @@ dependencies {
 
   annotationProcessor ("com.adaptris:interlok-core-apt") {changing= true}
 
-  testAnnotationProcessor ("com.adaptris:interlok-core-apt:$interlokCoreVersion") {changing= true}
+  testAnnotationProcessor ("com.adaptris:interlok-core-apt") {changing= true}
 
   testImplementation ("org.junit.jupiter:junit-jupiter-engine")
   testImplementation ("org.junit.platform:junit-platform-launcher")

@@ -6,7 +6,7 @@ plugins {
   id "maven-publish"
   id "jacoco"
   // Manage optional dependencies in maven pom.
-  id "nebula.optional-base" version "7.0.0"
+  id "com.netflix.nebula.optional-base" version "9.0.0"
   id "com.github.spotbugs" version "6.5.13"
   id "org.sonarqube" version "6.3.1.5724"
   id "org.owasp.dependencycheck" version "12.2.2"
@@ -71,8 +71,11 @@ ext.buildInfo = { ->
     }
 }
 
-sourceCompatibility = JavaVersion.VERSION_17
-targetCompatibility = JavaVersion.VERSION_17
+sourceCompatibility = JavaVersion.VERSION_21
+targetCompatibility = JavaVersion.VERSION_21
+tasks.withType(JavaCompile).configureEach {
+  options.release = 21
+}
 group   = 'com.adaptris'
 version = releaseVersion
 def versionDir = "$buildDir/version"
@@ -283,17 +286,17 @@ javadoc {
 }
 
 task javadocJar(type: Jar, dependsOn: javadoc) {
-  classifier = 'javadoc'
+  archiveClassifier.set('javadoc')
   from javadoc.destinationDir
 }
 
 task examplesJar(type: Jar, dependsOn: test) {
-  classifier = 'examples'
+  archiveClassifier.set('examples')
   from new File(buildDir, '/examples')
 }
 
 task sourcesJar(type: Jar, dependsOn: classes) {
-  classifier = 'sources'
+  archiveClassifier.set('sources')
   from sourceSets.main.allSource
 }
 
@@ -308,9 +311,9 @@ publishing {
     mavenJava(MavenPublication) {
       from components.java
 
-      artifact javadocJar { classifier "javadoc" }
-      artifact examplesJar { classifier "examples" }
-      artifact sourcesJar { classifier "sources" }
+      artifact javadocJar
+      artifact examplesJar
+      artifact sourcesJar
       pom.withXml {
         asNode().appendNode("name", componentName)
         asNode().appendNode("description", componentDesc)
@@ -350,7 +353,10 @@ spotbugsMain {
 }
 
 dependencyCheck  {
-  suppressionFiles= [ "https://raw.githubusercontent.com/adaptris/interlok/develop/gradle/owasp-exclude.xml" ]
+  suppressionFiles= [
+    "gradle/owasp-exclude.xml",
+    "https://raw.githubusercontent.com/adaptris/interlok/develop/gradle/owasp-exclude.xml"
+  ]
   scanConfigurations = [ "api", "compileClasspath", "runtimeClasspath" ]
   formats = [ "HTML", "JUNIT" ]
   junitFailOnCVSS = 7.0

@@ -2,38 +2,118 @@
 <suppressions xmlns="https://jeremylong.github.io/DependencyCheck/dependency-suppression.1.3.xsd">
   <suppress>
     <notes><![CDATA[
-    file name: mxparser-1.2.1.jar matched from : cpe:2.3:a:xstream_project:xstream:*:*:*:*:*:*:*:* versions up to (including) 1.4.6
-     - This is the replacement for xpp3 which is made by xstream but isn't xstream so the regexp is all wrong.
-     - we can't do
-      <packageUrl regex="true">^pkg:maven/io\.github\.x\-stream/mxparser@.*$</packageUrl>
-      <cpe>cpe:/a:xstream_project:xstream</cpe>
-      Because this causes it to have a low-confidence match against some oracle crap so just exclude the explicit CVEs
+      CVE-2017-10355 affects Oracle Java SE/JRockit versions through Java 9, not Xerces.
+      Dependency-Check's Xerces CPE match is a false positive; this project's runtime is Java 21.
+      https://nvd.nist.gov/vuln/detail/CVE-2017-10355
     ]]></notes>
-    <packageUrl regex="true">^pkg:maven/io\.github\.x\-stream/mxparser@.*$</packageUrl>
-    <cve>CVE-2013-7285</cve>
-    <cve>CVE-2016-3674</cve>
-    <cve>CVE-2017-7957</cve>
-    <cve>CVE-2020-26217</cve>
-    <cve>CVE-2020-26258</cve>
-    <cve>CVE-2020-26259</cve>
+    <packageUrl>pkg:maven/xerces/xercesImpl@2.12.2</packageUrl>
+    <cve>CVE-2017-10355</cve>
   </suppress>
   <suppress>
     <notes><![CDATA[
-      file name: spring-boot-loader-2.7.18.jar
-      We are pinned to Spring Boot 2.7.x on Java 17. There is no newer 2.7.x release in Maven Central,
-      so these CVEs cannot be remediated by an in-line version bump at the moment.
+      Xerces 2.12.2 is the newest Xerces 2.x release available from Maven Central, with no patched
+      version in that line. Replacing Xerces requires application changes because code references
+      Xerces-specific classes. Defer parser migration to the separate dependency-modernization effort.
+      https://bugzilla.redhat.com/show_bug.cgi?id=1451960
     ]]></notes>
-    <packageUrl regex="true">^pkg:maven/org\.springframework\.boot/spring-boot-loader@2\.7\.18$</packageUrl>
-    <cve>CVE-2026-40972</cve>
-    <cve>CVE-2026-40973</cve>
-    <cve>CVE-2026-40974</cve>
-    <cve>CVE-2026-40975</cve>
-    <cve>CVE-2026-40977</cve>
-  </suppress>  <suppress>
+    <packageUrl>pkg:maven/xerces/xercesImpl@2.12.2</packageUrl>
+    <cve>CVE-2017-7503</cve>
+  </suppress>
+  <suppress>
     <notes><![CDATA[
-      Jetty 10.0.26 is the newest Jetty 10 release available in Maven Central. Remediation for this CVE
-      requires moving off the Jetty 10 line, which is outside the current Java 17 / Jetty 10 constraints.
+      CVE-2023-36479 was fixed in Jetty 10.0.16. The scanned jetty-servlets version is 10.0.26,
+      so this Dependency-Check match is a false positive.
+      https://github.com/jetty/jetty.project/security/advisories
+    ]]></notes>
+    <packageUrl>pkg:maven/org.eclipse.jetty/jetty-servlets@10.0.26</packageUrl>
+    <cve>CVE-2023-36479</cve>
+  </suppress>
+  <suppress>
+    <notes><![CDATA[
+      CVE-2025-1948 affects Jetty 12.0.0 through 12.0.16, not Jetty 10.0.26. This is a false positive.
+      https://github.com/jetty/jetty.project/security/advisories
+    ]]></notes>
+    <packageUrl>pkg:maven/org.eclipse.jetty.http2/http2-common@10.0.26</packageUrl>
+    <cve>CVE-2025-1948</cve>
+  </suppress>
+  <suppress>
+    <notes><![CDATA[
+      The 2026-11-25 Dependency-Check report matches these CVEs against Jetty 10.0.26 artifacts.
+      Jetty 10 is end-of-life and 10.0.26 is its final release in Maven Central; no public patched
+      release exists in this major line. Remediation requires a Jetty 11/12 major upgrade, deferred
+      to the separate dependency-modernization effort. Java 21 does not remediate these findings.
+      This suppression records the compatibility decision, not remediation.
+      https://github.com/jetty/jetty.project/security/advisories
     ]]></notes>
     <packageUrl regex="true">^pkg:maven/org\.eclipse\.jetty(\.http2|\.websocket)?/.+@10\.0\.26$</packageUrl>
+    <cve>CVE-2025-11143</cve>
+    <cve>CVE-2026-10050</cve>
     <cve>CVE-2026-2332</cve>
-  </suppress></suppressions>
+    <cve>CVE-2026-5795</cve>
+    <cve>CVE-2026-6790</cve>
+  </suppress>
+  <suppress>
+    <notes><![CDATA[
+      CVE-2026-12611 is an HTTP/2 blocking-write denial of service affecting Jetty 10.0.0-10.0.31.
+      Jetty 10.0.26 has no public same-major fix; remediation requires a major Jetty upgrade,
+      deferred to the separate dependency-modernization effort.
+      https://github.com/jetty/jetty.project/security/advisories/GHSA-gpg9-4257-cfm3
+    ]]></notes>
+    <packageUrl>pkg:maven/org.eclipse.jetty.http2/http2-common@10.0.26</packageUrl>
+    <cve>CVE-2026-12611</cve>
+  </suppress>
+  <suppress>
+    <notes><![CDATA[
+      CVE-2026-18661 affects Jetty annotations 10.0.0-10.0.32 and can bypass servlet security
+      constraints. No public Jetty 10.0.26 fix exists; remediation requires a major Jetty upgrade,
+      deferred to the separate dependency-modernization effort.
+      https://github.com/jetty/jetty.project/security/advisories/GHSA-v6xf-996f-c35f
+    ]]></notes>
+    <packageUrl>pkg:maven/org.eclipse.jetty/jetty-annotations@10.0.26</packageUrl>
+    <cve>CVE-2026-18661</cve>
+  </suppress>
+  <suppress>
+    <notes><![CDATA[
+      CVE-2026-76184 and CVE-2026-77711 affect Jetty client 10.0.0-10.0.32 and can disclose
+      Authorization or proxy credentials. No public Jetty 10.0.26 fix exists; remediation requires
+      a major Jetty upgrade, deferred to the separate dependency-modernization effort.
+      https://github.com/jetty/jetty.project/security/advisories/GHSA-qfr2-43g5-g768
+      https://github.com/jetty/jetty.project/security/advisories/GHSA-r2c5-3p8g-wpvw
+    ]]></notes>
+    <packageUrl>pkg:maven/org.eclipse.jetty/jetty-client@10.0.26</packageUrl>
+    <cve>CVE-2026-76184</cve>
+    <cve>CVE-2026-77711</cve>
+  </suppress>
+  <suppress>
+    <notes><![CDATA[
+      CVE-2026-19203 affects Jetty HTTP 10.0.0-10.0.32. The scanned 10.0.26 version has no public
+      same-major fix; remediation requires a major Jetty upgrade, deferred to modernization.
+      https://github.com/jetty/jetty.project/security/advisories
+    ]]></notes>
+    <packageUrl>pkg:maven/org.eclipse.jetty/jetty-http@10.0.26</packageUrl>
+    <cve>CVE-2026-19203</cve>
+  </suppress>
+  <suppress>
+    <notes><![CDATA[
+      CVE-2026-19204 affects Jetty server 10.0.0-10.0.32. The scanned 10.0.26 version has no public
+      same-major fix; remediation requires a major Jetty upgrade, deferred to modernization.
+      https://github.com/jetty/jetty.project/security/advisories
+    ]]></notes>
+    <packageUrl>pkg:maven/org.eclipse.jetty/jetty-server@10.0.26</packageUrl>
+    <cve>CVE-2026-19204</cve>
+  </suppress>
+  <suppress>
+    <notes><![CDATA[
+      CVE-2026-18659, CVE-2026-18662, and CVE-2026-19864 affect Jetty security 10.0.0-10.0.32.
+      The scanned 10.0.26 version has no public same-major fix; remediation requires a major Jetty
+      upgrade, deferred to the separate dependency-modernization effort.
+      https://github.com/jetty/jetty.project/security/advisories/GHSA-53x7-f9fc-h7qr
+      https://github.com/jetty/jetty.project/security/advisories/GHSA-phjh-v7c6-g7mv
+      https://github.com/jetty/jetty.project/security/advisories/GHSA-q6wx-j9wr-fj7f
+    ]]></notes>
+    <packageUrl>pkg:maven/org.eclipse.jetty/jetty-security@10.0.26</packageUrl>
+    <cve>CVE-2026-18659</cve>
+    <cve>CVE-2026-18662</cve>
+    <cve>CVE-2026-19864</cve>
+  </suppress>
+</suppressions>
